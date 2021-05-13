@@ -1,0 +1,14 @@
+{
+    "Modify":  {
+        "AddCharactorEvent": [
+        ],
+        "UpdateEvent": [
+        ],
+        "ReplaceEventName": [
+        ],
+        "ReplaceOption": [
+        ],
+        "ReplaceEffect": [
+        ]
+    }
+}

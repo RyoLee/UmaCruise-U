@@ -1,0 +1,455 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "wtl\atlres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 非特定语言 resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(65001)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 342, 222
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_ACCEPTFILES
+CAPTION "About"
+FONT 9, "Segoe UI", 0, 0, 0x0
+BEGIN
+    GROUPBOX        "Original",IDC_STATIC,7,6,115,94
+    ICON            IDR_MAINFRAME,IDC_STATIC,54,16,20,20,SS_CENTERIMAGE
+    CTEXT           "UmaUmaCruise\n{version}\n\n(c) Copyright 2021 amate",IDC_STATIC_ABOUT,13,37,103,32
+    CONTROL         "<a>Home Page</a>",IDC_SYSLINK_ORI_HOMEPAGE,"SysLink",WS_TABSTOP,48,74,36,10
+    GROUPBOX        "Extra",IDC_STATIC,126,6,210,94
+    LTEXT           "UmaMusumeLibrary.json is generated from Urarawin",IDC_STATIC,132,18,190,18
+    CONTROL         "<a>https://github.com/RyoLee/UmaUmaCruise-db-urarawin</a>",IDC_SYSLINK_DB,
+                    "SysLink",WS_TABSTOP,132,28,180,11
+    LTEXT           "UmaCruise-U is a customized version of UmaUmaCruise",IDC_STATIC,132,44,190,18
+    CONTROL         "<a>https://github.com/RyoLee/UmaCruise-U</a>",IDC_SYSLINK_HOMEPAGE,
+                    "SysLink",WS_TABSTOP,132,54,180,11
+    CONTROL         "Checking update...<a></a>",IDC_SYSLINK_VERSIONCHECK,
+                    "SysLink",WS_TABSTOP,132,78,70,11
+    GROUPBOX        "Debug",IDC_STATIC,6,102,330,117
+    COMBOBOX        IDC_COMBO_TESTBOUNDS,18,114,104,174,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_RESULT,18,132,156,60,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_RESULT2,174,132,156,60,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL
+    PUSHBUTTON      "OCR",IDC_BUTTON_OCR,18,198,36,18
+    CONTROL         "",IDC_SLIDER_THRESHOLD,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,60,200,68,12
+    DEFPUSHBUTTON   "OK",IDOK,294,198,36,18
+END
+
+IDD_MAINDLG DIALOGEX 0, 0, 303, 484
+STYLE DS_SETFONT | WS_MINIMIZEBOX | WS_CAPTION | WS_SYSMENU
+CAPTION "UmaCruise-U"
+FONT 9, "Segoe UI", 0, 0, 0x0
+BEGIN
+    CONTROL         "Start",IDC_CHECK_START,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE | WS_TABSTOP,6,6,50,18
+    PUSHBUTTON      "Screenshot",IDC_BUTTON_SCREENSHOT,64,6,90,18
+    PUSHBUTTON      "Setting",IDC_BUTTON_CONFIG,162,6,36,18
+    PUSHBUTTON      "About",ID_APP_ABOUT,202,6,36,18
+    PUSHBUTTON      "Preview",IDC_BUTTON_PREVIEW,242,6,36,18
+    PUSHBUTTON      "⇔",IDC_BUTTON_SHOWHIDE_RACELIST,284,6,13,18
+    LTEXT           "Training",IDC_STATIC,9,36,55,8
+    COMBOBOX        IDC_COMBO_UMAMUSUME,64,35,233,276,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Source",IDC_STATIC,9,53,55,8
+    EDITTEXT        IDC_EDIT_EVENT_SOURCE,64,52,233,12,ES_AUTOHSCROLL
+    LTEXT           "Event",IDC_STATIC,9,69,55,8
+    EDITTEXT        IDC_EDIT_EVENTNAME,64,68,233,12,ES_AUTOHSCROLL
+    GROUPBOX        "Options",IDC_STATIC,6,81,292,400
+    EDITTEXT        IDC_EDIT_OPTION1,12,97,90,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_OPTION2,12,173,90,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_OPTION3,12,249,90,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_OPTION4,12,325,90,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_OPTION5,12,401,90,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_EFFECT1,110,97,180,70,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN
+    EDITTEXT        IDC_EDIT_EFFECT2,110,173,180,70,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN
+    EDITTEXT        IDC_EDIT_EFFECT3,110,249,180,70,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN
+    EDITTEXT        IDC_EDIT_EFFECT4,110,325,180,70,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN
+    EDITTEXT        IDC_EDIT_EFFECT5,110,401,180,70,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN
+    PUSHBUTTON      "Correct",IDC_BUTTON_REVISION,12,453,50,18
+END
+
+IDD_PREVIEW DIALOGEX 0, 0, 309, 176
+STYLE DS_SETFONT | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "PreviewWindow"
+FONT 9, "Segoe UI", 0, 0, 0x0
+BEGIN
+END
+
+IDD_CONFIG DIALOGEX 0, 0, 309, 176
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Setting"
+FONT 9, "Segoe UI", 0, 0, 0x0
+BEGIN
+    CONTROL         "Auto start at startup.",IDC_CHECK_AUTOSTART,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,8,142,12
+    PUSHBUTTON      "Check update for UmaMusumeLibrary.json",IDC_BUTTON_CHECK_UMALIBRARY,160,6,143,18
+    CONTROL         "Stop refreshing the preview window",IDC_CHECK_STOPUPDATEPREVIEWONTRAINING,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,30,142,12
+    CONTROL         "Separate the race list window*",IDC_CHECK_POPUP_RACELISTWINDOW,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,52,142,12
+    LTEXT           "*Reset the race list window to the center by press Ctrl+⇔(Show/Hide button on UI)",IDC_STATIC,160,52,142,16
+    CONTROL         "Notification on the date of the reserved race",IDC_CHECK_NOTIFY_FAVORITERACEHOLD,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,74,142,12
+    LTEXT           "Interval:",IDC_STATIC,12,96,32,12
+    COMBOBOX        IDC_COMBO_REFRESHINTERVAL,44,95,30,84,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Sec",IDC_STATIC,79,96,36,12
+    LTEXT           "Theme:",IDC_STATIC,12,118,32,12
+    COMBOBOX        IDC_COMBO_THEME,44,118,30,54,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,198,155,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,252,155,50,14
+END
+
+IDD_RACELIST DIALOGEX 0, 0, 331, 484
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION
+CAPTION "Race List"
+FONT 9, "Segoe UI", 0, 0, 0x0
+BEGIN
+    GROUPBOX        "Most recent races",IDC_STATIC_RACELIST_GROUP,6,1,319,480
+    LTEXT           "Current date",IDC_STATIC,14,14,50,12
+    EDITTEXT        IDC_EDIT_NOWDATE,60,9,120,20,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_EXPECT_URA,186,10,78,43,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN
+    CONTROL         "Show races after the current date",IDC_CHECK_SHOWRACE_AFTERCURRENTDATE,
+                    "Button",BS_AUTOCHECKBOX | BS_PUSHLIKE | BS_MULTILINE | WS_TABSTOP,270,10,49,43
+    GROUPBOX        "Rank",IDC_STATIC,14,30,90,23
+    CONTROL         "G1",IDC_CHECK_G1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,38,22,12
+    CONTROL         "G2",IDC_CHECK_G2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,48,38,22,12
+    CONTROL         "G3",IDC_CHECK_G3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,76,38,22,12
+    GROUPBOX        "Ground",IDC_STATIC,110,30,70,23
+    CONTROL         "Turf",IDC_CHECK_GRASS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,116,38,26,12
+    CONTROL         "Dirt",IDC_CHECK_DART,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,148,38,26,12
+    GROUPBOX        "Distance",IDC_STATIC,14,55,166,23
+    CONTROL         "Short",IDC_CHECK_SPRINT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,63,34,12
+    CONTROL         "Mile",IDC_CHECK_MILE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,60,63,34,12
+    CONTROL         "Middle",IDC_CHECK_MIDDLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,63,34,12
+    CONTROL         "Long",IDC_CHECK_LONG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,63,34,12
+    GROUPBOX        "Direction",IDC_STATIC,186,55,133,23
+    CONTROL         "CW",IDC_CHECK_RIGHT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,192,63,36,12
+    CONTROL         "CCW",IDC_CHECK_LEFT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,234,63,36,12
+    CONTROL         "SL",IDC_CHECK_LINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,276,63,36,12
+    GROUPBOX        "Racetrack",IDC_STATIC,13,80,306,23
+    CONTROL         "札幌",IDC_CHECK_LOCATION_SAPPORO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,89,24,12
+    CONTROL         "函館",IDC_CHECK_LOCATION_HAKODATE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,46,89,24,12
+    CONTROL         "福島",IDC_CHECK_LOCATION_HUKUSIMA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,74,89,24,12
+    CONTROL         "新潟",IDC_CHECK_LOCATION_NIIGATA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,102,89,24,12
+    CONTROL         "東京",IDC_CHECK_LOCATION_TOKYO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,89,24,12
+    CONTROL         "中山",IDC_CHECK_LOCATION_NAKAYAMA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,89,24,12
+    CONTROL         "中京",IDC_CHECK_LOCATION_TYUUKYOU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,182,89,24,12
+    CONTROL         "京都",IDC_CHECK_LOCATION_KYOTO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,210,89,24,12
+    CONTROL         "阪神",IDC_CHECK_LOCATION_HANSHIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,237,89,24,12
+    CONTROL         "小倉",IDC_CHECK_LOCATION_OGURA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,263,89,24,12
+    CONTROL         "大井",IDC_CHECK_LOCATION_OOI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,290,89,24,12
+    CONTROL         "",IDC_LIST_RACE,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,14,107,305,364
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 335
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 215
+    END
+
+    IDD_MAINDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 215
+    END
+
+    IDD_PREVIEW, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 169
+    END
+
+    IDD_CONFIG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 169
+    END
+
+    IDD_RACELIST, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 324
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 217
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_MAINDLG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_PREVIEW AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_ABOUTBOX AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_CONFIG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_RACELIST AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_CONFIG DLGINIT
+BEGIN
+    IDC_COMBO_THEME, 0x403, 5, 0
+0xa98e, 0xae93, "\000" 
+    IDC_COMBO_THEME, 0x403, 7, 0
+0x5f83, 0x5b81, 0x4e83, "\000" 
+    IDC_COMBO_THEME, 0x403, 7, 0
+0x8983, 0x4383, 0x6783, "\000" 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "FileDescription", "UmaCruise Module"
+            VALUE "FileVersion", "1.0.0.0"
+            VALUE "InternalName", "UmaCruise-U"
+            VALUE "LegalCopyright", "Copyright 2021"
+            VALUE "OriginalFilename", "UmaCruise.exe"
+            VALUE "ProductName", "UmaCruise Module"
+            VALUE "ProductVersion", "1.0.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END
+
+#endif    // 非特定语言 resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 英语(美国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""atlres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\UmaCruise.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS
+BEGIN
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL
+    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL
+    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL
+    "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY 
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDR_MAINFRAME           "UmaCruise"
+END
+
+STRINGTABLE
+BEGIN
+    ID_FILE_NEW             "Create a new document\nNew"
+    ID_FILE_OPEN            "Open an existing document\nOpen"
+    ID_FILE_CLOSE           "Close the active document\nClose"
+    ID_FILE_SAVE            "Save the active document\nSave"
+    ID_FILE_SAVE_AS         "Save the active document with a new name\nSave As"
+    ID_FILE_PAGE_SETUP      "Change the printing options\nPage Setup"
+    ID_FILE_PRINT_SETUP     "Change the printer and printing options\nPrint Setup"
+    ID_FILE_PRINT           "Print the active document\nPrint"
+    ID_FILE_PRINT_PREVIEW   "Display full pages\nPrint Preview"
+END
+
+STRINGTABLE
+BEGIN
+    ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
+    ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
+END
+
+STRINGTABLE
+BEGIN
+    ID_NEXT_PANE            "Switch to the next window pane\nNext Pane"
+    ID_PREV_PANE            "Switch back to the previous window pane\nPrevious Pane"
+END
+
+STRINGTABLE
+BEGIN
+    ID_WINDOW_NEW           "Open another window for the active document\nNew Window"
+    ID_WINDOW_ARRANGE       "Arrange icons at the bottom of the window\nArrange Icons"
+    ID_WINDOW_CASCADE       "Arrange windows so they overlap\nCascade Windows"
+    ID_WINDOW_TILE_HORZ     "Arrange windows as non-overlapping tiles\nTile Windows"
+    ID_WINDOW_TILE_VERT     "Arrange windows as non-overlapping tiles\nTile Windows"
+    ID_WINDOW_SPLIT         "Split the active window into panes\nSplit"
+END
+
+STRINGTABLE
+BEGIN
+    ID_EDIT_CLEAR           "Erase the selection\nErase"
+    ID_EDIT_CLEAR_ALL       "Erase everything\nErase All"
+    ID_EDIT_COPY            "Copy the selection and put it on the Clipboard\nCopy"
+    ID_EDIT_CUT             "Cut the selection and put it on the Clipboard\nCut"
+    ID_EDIT_FIND            "Find the specified text\nFind"
+    ID_EDIT_PASTE           "Insert Clipboard contents\nPaste"
+    ID_EDIT_REPEAT          "Repeat the last action\nRepeat"
+    ID_EDIT_REPLACE         "Replace specific text with different text\nReplace"
+    ID_EDIT_SELECT_ALL      "Select the entire document\nSelect All"
+    ID_EDIT_UNDO            "Undo the last action\nUndo"
+    ID_EDIT_REDO            "Redo the previously undone action\nRedo"
+END
+
+STRINGTABLE
+BEGIN
+    ATL_IDS_SCSIZE          "Change the window size"
+    ATL_IDS_SCMOVE          "Change the window position"
+    ATL_IDS_SCMINIMIZE      "Reduce the window to an icon"
+    ATL_IDS_SCMAXIMIZE      "Enlarge the window to full size"
+    ATL_IDS_SCNEXTWINDOW    "Switch to the next document window"
+    ATL_IDS_SCPREVWINDOW    "Switch to the previous document window"
+    ATL_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
+END
+
+STRINGTABLE
+BEGIN
+    ATL_IDS_SCRESTORE       "Restore the window to normal size"
+    ATL_IDS_SCTASKLIST      "Activate Task List"
+    ATL_IDS_MDICHILD        "Activate this window"
+END
+
+STRINGTABLE
+BEGIN
+    ATL_IDS_IDLEMESSAGE     "Ready"
+END
+
+STRINGTABLE
+BEGIN
+    ATL_IDS_MRU_FILE        "Open this document"
+END
+
+#endif    // 英语(美国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
