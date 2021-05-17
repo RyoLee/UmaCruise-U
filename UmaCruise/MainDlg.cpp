@@ -11,6 +11,8 @@
 #include "Utility\CommonUtility.h"
 #include "Utility\json.hpp"
 #include "Utility\timer.h"
+#include "Utility\Logger.h"
+#include "Utility\WinHTTPWrapper.h"
 #include "win32-darkmode\DarkMode.h"
 
 #include "ConfigDlg.h"
@@ -18,6 +20,7 @@
 using json = nlohmann::json;
 using namespace CodeConvert;
 using namespace cv;
+using namespace WinHTTPWrapper;
 
 
 bool IsDarkMode()
@@ -178,6 +181,31 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 
 				m_targetWindowName = UTF16fromUTF8(jsonCommon["Common"]["TargetWindow"]["WindowName"].get<std::string>()).c_str();
 				m_targetClassName = UTF16fromUTF8(jsonCommon["Common"]["TargetWindow"]["ClassName"].get<std::string>()).c_str();
+				bool checkLibrary = jsonCommon["Common"]["UmaMusumeLibrary"]["AutoCheck"];
+				if(checkLibrary){
+					try {
+						std::string libraryURL = jsonCommon["Common"]["UmaMusumeLibrary"]["URL"];
+						auto umaLibraryPath = GetExeDirectory() / L"UmaLibrary" / L"UmaMusumeLibrary.json";
+						const DWORD umaLibraryFileSize = static_cast<DWORD>(fs::file_size(umaLibraryPath));
+						CUrl downloadUrl(libraryURL.c_str());
+						auto hConnect = HttpConnect(downloadUrl);
+						auto hRequest = HttpOpenRequest(downloadUrl, hConnect, L"HEAD");
+						if (HttpSendRequestAndReceiveResponse(hRequest)) {
+							int statusCode = HttpQueryStatusCode(hRequest);
+							if (statusCode == 200) {
+								DWORD contentLength = 0;
+								HttpQueryHeaders(hRequest, WINHTTP_QUERY_CONTENT_LENGTH, contentLength);
+								if (umaLibraryFileSize != contentLength) {
+									MessageBox(L"UmaMusumeLibrary.json\nA new version avaliable!", L"Update", MB_ICONINFORMATION);
+								}
+							}
+						}
+					}
+					catch (boost::exception& e) {
+						std::string expText = boost::diagnostic_information(e);
+						ERROR_LOG << L"OnCheckUmaLibrary exception: " << (LPCWSTR)CA2W(expText.c_str());
+					}
+				}
 			}
 		}
 

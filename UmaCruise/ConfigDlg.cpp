@@ -81,13 +81,13 @@ void ConfigDlg::OnCheckUmaLibrary(UINT uNotifyCode, int nID, CWindow wndCtl)
 		}
 		json jsonCommon;
 		ifs >> jsonCommon;
-		std::string libraryURL = jsonCommon["Common"]["UmaMusumeLibraryURL"];
+		std::string libraryURL = jsonCommon["Common"]["UmaMusumeLibrary"]["URL"];
 
 		// ファイルサイズ取得
 		auto umaLibraryPath = GetExeDirectory() / L"UmaLibrary" / L"UmaMusumeLibrary.json";
 		const DWORD umaLibraryFileSize = static_cast<DWORD>(fs::file_size(umaLibraryPath));
 
-		CUrl	downloadUrl(libraryURL.c_str());
+		CUrl downloadUrl(libraryURL.c_str());
 		auto hConnect = HttpConnect(downloadUrl);
 		auto hRequest = HttpOpenRequest(downloadUrl, hConnect, L"HEAD");
 		if (HttpSendRequestAndReceiveResponse(hRequest)) {
@@ -100,11 +100,11 @@ void ConfigDlg::OnCheckUmaLibrary(UINT uNotifyCode, int nID, CWindow wndCtl)
 					auto optDLData = HttpDownloadData(downloadUrl.GetURL());
 					if (optDLData) {
 						// 古い方を残しておく
-						auto prevPath = umaLibraryPath.parent_path() / (umaLibraryPath.stem().wstring() + L"_prev.json");
-						fs::rename(umaLibraryPath, prevPath);
-
+						//auto prevPath = umaLibraryPath.parent_path() / (umaLibraryPath.stem().wstring() + L"_prev.json");
+						//fs::rename(umaLibraryPath, prevPath);
+						fs::remove(umaLibraryPath);
 						SaveFile(umaLibraryPath, optDLData.get());
-						MessageBox(L"Updated\nNew UmaMusumeLibrary.json file will take effect at next time", L"Success");
+						MessageBox(L"Updated!\nNew UmaMusumeLibrary.json file will take effect at next time", L"Success");
 						GetDlgItem(IDC_BUTTON_CHECK_UMALIBRARY).EnableWindow(FALSE);
 						return;
 					} else {
