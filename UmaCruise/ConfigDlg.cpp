@@ -30,8 +30,8 @@ LRESULT ConfigDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	}
 
 	m_autoStart = m_config.autoStart;
+	m_autoCheckDB = m_config.autoCheckDB;
 	m_stopUpdatePreviewOnTraining = m_config.stopUpdatePreviewOnTraining;
-	m_popupRaceListWindow = m_config.popupRaceListWindow;
 	m_notifyFavoriteRaceHold = m_config.notifyFavoriteRaceHold;
 	m_theme = static_cast<int>(m_config.theme);
 	DoDataExchange(DDX_LOAD);
@@ -53,8 +53,8 @@ LRESULT ConfigDlg::OnOK(WORD, WORD wID, HWND, BOOL&)
 		m_config.refreshInterval = index + 1;
 	}
 	m_config.autoStart = m_autoStart;
+	m_config.autoCheckDB = m_autoCheckDB;
 	m_config.stopUpdatePreviewOnTraining = m_stopUpdatePreviewOnTraining;
-	m_config.popupRaceListWindow = m_popupRaceListWindow;
 	m_config.notifyFavoriteRaceHold = m_notifyFavoriteRaceHold;
 	m_config.theme = static_cast<Config::Theme>(m_theme);
 
@@ -68,69 +68,4 @@ LRESULT ConfigDlg::OnCancel(WORD, WORD, HWND, BOOL&)
 {
 	EndDialog(IDCANCEL);
 	return 0;
-}
-
-void ConfigDlg::OnCheckUmaLibrary(UINT uNotifyCode, int nID, CWindow wndCtl)
-{
-	try {
-		std::ifstream ifs((GetExeDirectory() / L"UmaLibrary" / "Common.json").wstring());
-		ATLASSERT(ifs);
-		if (!ifs) {
-			MessageBox(L"Load failed:Common.json");
-			return;
-		}
-		json jsonCommon;
-		ifs >> jsonCommon;
-		std::string libraryURL = jsonCommon["Common"]["UmaMusumeLibrary"]["URL"];
-
-		// ファイルサイズ取得
-		auto umaLibraryPath = GetExeDirectory() / L"UmaLibrary" / L"UmaMusumeLibrary.json";
-		const DWORD umaLibraryFileSize = static_cast<DWORD>(fs::file_size(umaLibraryPath));
-
-		CUrl downloadUrl(libraryURL.c_str());
-		auto hConnect = HttpConnect(downloadUrl);
-		auto hRequest = HttpOpenRequest(downloadUrl, hConnect, L"HEAD");
-		if (HttpSendRequestAndReceiveResponse(hRequest)) {
-			int statusCode = HttpQueryStatusCode(hRequest);
-			if (statusCode == 200) {
-				DWORD contentLength = 0;
-				HttpQueryHeaders(hRequest, WINHTTP_QUERY_CONTENT_LENGTH, contentLength);
-				if (umaLibraryFileSize != contentLength) {	// ファイルサイズ比較
-					// 更新する
-					auto optDLData = HttpDownloadData(downloadUrl.GetURL());
-					if (optDLData) {
-						// 古い方を残しておく
-						//auto prevPath = umaLibraryPath.parent_path() / (umaLibraryPath.stem().wstring() + L"_prev.json");
-						//fs::rename(umaLibraryPath, prevPath);
-						fs::remove(umaLibraryPath);
-						SaveFile(umaLibraryPath, optDLData.get());
-						MessageBox(L"Updated!\nNew UmaMusumeLibrary.json file will take effect at next time", L"Success");
-						GetDlgItem(IDC_BUTTON_CHECK_UMALIBRARY).EnableWindow(FALSE);
-						return;
-					} else {
-						MessageBox(L"Download failed...", L"Error", MB_ICONERROR);
-						return;
-					}
-				} else {
-					MessageBox(L"No updates", L"Success");
-					GetDlgItem(IDC_BUTTON_CHECK_UMALIBRARY).EnableWindow(FALSE);
-					return;
-				}
-			} else {
-				CString errorText;
-				errorText.Format(L"The server returned an error.\nStatus code: %d", statusCode);
-				MessageBox(errorText, L"Error", MB_ICONERROR);
-				return;
-			}
-		} else {
-			MessageBox(L"Failed to send the request.\nSee details on info.log.", L"Error", MB_ICONERROR);
-			return;
-		}
-	} catch (boost::exception& e) {
-		std::string expText = boost::diagnostic_information(e);
-		ERROR_LOG << L"OnCheckUmaLibrary exception: " << (LPCWSTR)CA2W(expText.c_str());
-		int a = 0;
-	}
-	ATLASSERT(FALSE);
-	MessageBox(L"An error has occurred...", L"Error", MB_ICONERROR);
 }

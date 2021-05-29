@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ で生成されたインクルード ファイル。
-// UmaCruise.rc で使用
+// Microsoft Visual C++ 生成的包含文件。
+// 供 UmaCruise.rc 使用
 //
 #define IDD_ABOUTBOX                    100
 #define IDR_MAINFRAME                   128
@@ -33,9 +33,7 @@
 #define IDC_BUTTON_REVISION             1037
 #define IDC_CHECK_STOPUPDATEPREVIEWONTRAINING 1037
 #define IDC_BUTTON1                     1038
-#define IDC_BUTTON_CHECK_UMALIBRARY     1038
 #define IDC_STATIC_ABOUT                1039
-#define IDC_CHECK_POPUP_RACELISTWINDOW  1039
 #define IDC_SYSLINK_DB                  1040
 #define IDC_CHECK_NOTIFY_FAVORITERACEHOLD 1040
 #define IDC_EDIT1                       1041
@@ -46,6 +44,10 @@
 #define IDC_COMBO1                      1044
 #define IDC_COMBO_THEME                 1044
 #define IDC_RICHEDIT21                  1045
+#define IDC_STATIC_EX                   1046
+#define IDC_BUTTON_SHOWHIDE_EXOPTS      1046
+#define IDC_STATIC_OPT_GROUP            1047
+#define IDC_CHECK_AUTOUPDATE            1048
 #define IDC_EDIT_OPTION1                1500
 #define IDC_EDIT_OPTION2                1501
 #define IDC_EDIT_OPTION3                1502

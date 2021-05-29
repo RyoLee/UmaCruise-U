@@ -120,7 +120,10 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	}
 
 	m_config.LoadConfig();
-
+	
+	if(m_config.autoCheckDB){
+		_CheckUmaLibrary();
+	}
 	ChangeGlobalTheme(m_config.theme);
 
 	DoDataExchange(DDX_LOAD);
@@ -181,31 +184,6 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 
 				m_targetWindowName = UTF16fromUTF8(jsonCommon["Common"]["TargetWindow"]["WindowName"].get<std::string>()).c_str();
 				m_targetClassName = UTF16fromUTF8(jsonCommon["Common"]["TargetWindow"]["ClassName"].get<std::string>()).c_str();
-				bool checkLibrary = jsonCommon["Common"]["UmaMusumeLibrary"]["AutoCheck"];
-				if(checkLibrary){
-					try {
-						std::string libraryURL = jsonCommon["Common"]["UmaMusumeLibrary"]["URL"];
-						auto umaLibraryPath = GetExeDirectory() / L"UmaLibrary" / L"UmaMusumeLibrary.json";
-						const DWORD umaLibraryFileSize = static_cast<DWORD>(fs::file_size(umaLibraryPath));
-						CUrl downloadUrl(libraryURL.c_str());
-						auto hConnect = HttpConnect(downloadUrl);
-						auto hRequest = HttpOpenRequest(downloadUrl, hConnect, L"HEAD");
-						if (HttpSendRequestAndReceiveResponse(hRequest)) {
-							int statusCode = HttpQueryStatusCode(hRequest);
-							if (statusCode == 200) {
-								DWORD contentLength = 0;
-								HttpQueryHeaders(hRequest, WINHTTP_QUERY_CONTENT_LENGTH, contentLength);
-								if (umaLibraryFileSize != contentLength) {
-									MessageBox(L"UmaMusumeLibrary.json\nA new version avaliable!", L"Update", MB_ICONINFORMATION);
-								}
-							}
-						}
-					}
-					catch (boost::exception& e) {
-						std::string expText = boost::diagnostic_information(e);
-						ERROR_LOG << L"OnCheckUmaLibrary exception: " << (LPCWSTR)CA2W(expText.c_str());
-					}
-				}
 			}
 		}
 
@@ -222,6 +200,7 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 				}
 
 				m_bShowRaceList = jsonSetting["MainDlg"].value<bool>("ShowRaceList", m_bShowRaceList);
+				m_bShowExOpts = jsonSetting["MainDlg"].value<bool>("ShowExOpts", m_bShowExOpts);
 			}
 
 			{
@@ -236,10 +215,9 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 				}
 			}
 		}
-		_DockOrPopupRaceListWindow();
+		_InitRaceListWindow();
 
 		DoDataExchange(DDX_LOAD);
-
 	} catch (std::exception& e)
 	{
 		ATLTRACE(L"%s\n", (LPCWSTR)(CA2W(e.what())));
@@ -247,14 +225,15 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 		ATLASSERT(FALSE);
 	}
 	ChangeWindowTitle(L"init suscess!");
-
 	if (m_config.autoStart) {
 		CButton(GetDlgItem(IDC_CHECK_START)).SetCheck(BST_CHECKED);
 		OnStart(0, 0, NULL);
 	}
 
 	DarkModeInit();
-
+	if(!m_bShowExOpts){
+		_ShowHideExOpts(m_bShowExOpts);
+	}
 	return TRUE;
 }
 
@@ -286,13 +265,43 @@ LRESULT CMainDlg::OnAppAbout(WORD, WORD, HWND, BOOL&)
 void CMainDlg::OnShowHideRaceList(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
 	m_bShowRaceList = !m_bShowRaceList;
+	_ExtentOrShrinkWindow(m_bShowRaceList);	
+}
 
-	if (m_config.popupRaceListWindow) {
-		m_raceListWindow.ShowWindow(m_bShowRaceList);
-
-	} else {
-		_ExtentOrShrinkWindow(m_bShowRaceList);	
+void CMainDlg::OnShowHideExOpts(UINT uNotifyCode, int nID, CWindow wndCtl)
+{
+	m_bShowExOpts = !m_bShowExOpts;
+	_ShowHideExOpts(m_bShowExOpts);
+}
+void CMainDlg::_ShowHideExOpts(bool bExtent)
+{
+	CRect rOptGroup;
+	CRect rOpt1;
+	CRect rOpt2;
+	CRect rRaceListGroup;
+	CRect rRaceList;
+	CRect rcWindow;
+	CRect rlWindow;
+	GetWindowRect(&rcWindow);
+	GetDlgItem(IDC_STATIC_OPT_GROUP).GetWindowRect(rOptGroup);
+	m_raceListWindow.GetWindowRect(rlWindow);
+	m_raceListWindow.GetDlgItem(IDC_STATIC_RACELIST_GROUP).GetWindowRect(rRaceListGroup);
+	m_raceListWindow.GetDlgItem(IDC_LIST_RACE).GetWindowRect(rRaceList);
+	GetDlgItem(IDC_EDIT_OPTION1).GetWindowRect(rOpt1);
+	GetDlgItem(IDC_EDIT_OPTION2).GetWindowRect(rOpt2);
+	int dH = (rOpt2.CenterPoint().y - rOpt1.CenterPoint().y)*2;
+	if (!bExtent) {
+		dH = -1 * dH;
 	}
+	m_raceListWindow.GetDlgItem(IDC_STATIC_RACELIST_GROUP).SetWindowPos(NULL, 0, 0, rRaceListGroup.Width(), rRaceListGroup.Height() + dH, SWP_NOZORDER | SWP_NOMOVE);
+	m_raceListWindow.GetDlgItem(IDC_LIST_RACE).SetWindowPos(NULL, 0, 0, rRaceList.Width(), rRaceList.Height() + dH, SWP_NOZORDER | SWP_NOMOVE);
+	GetDlgItem(IDC_STATIC_OPT_GROUP).SetWindowPos(NULL, 0, 0, rOptGroup.Width(), rOptGroup.Height()+ dH, SWP_NOZORDER | SWP_NOMOVE);
+	m_raceListWindow.SetWindowPos(NULL, 0, 0, rlWindow.Width(), rlWindow.Height()+ dH, SWP_NOZORDER | SWP_NOMOVE);
+	SetWindowPos(NULL, 0, 0, rcWindow.Width(), rcWindow.Height()+ dH, SWP_NOZORDER | SWP_NOMOVE);
+	GetDlgItem(IDC_EDIT_OPTION4).ShowWindow(bExtent);
+	GetDlgItem(IDC_EDIT_EFFECT4).ShowWindow(bExtent);
+	GetDlgItem(IDC_EDIT_OPTION5).ShowWindow(bExtent);
+	GetDlgItem(IDC_EDIT_EFFECT5).ShowWindow(bExtent);
 }
 
 LRESULT CMainDlg::OnCancel(WORD, WORD wID, HWND, BOOL&)
@@ -316,6 +325,7 @@ LRESULT CMainDlg::OnCancel(WORD, WORD wID, HWND, BOOL&)
 				nlohmann::json::array({ rcWindow.left, rcWindow.top, rcWindow.right, rcWindow.bottom });
 
 			jsonSetting["MainDlg"]["ShowRaceList"] = m_bShowRaceList;
+			jsonSetting["MainDlg"]["ShowExOpts"] = m_bShowExOpts;
 		}
 		{
 			CRect rcWindow;
@@ -338,14 +348,10 @@ LRESULT CMainDlg::OnCancel(WORD, WORD wID, HWND, BOOL&)
 
 void CMainDlg::OnShowConfigDlg(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	const bool prevPopupRaceListWindow = m_config.popupRaceListWindow;
 	const int prevTheme = m_config.theme;
 	ConfigDlg dlg(m_config);
 	auto ret = dlg.DoModal(m_hWnd);
 	if (ret == IDOK) {
-		if (prevPopupRaceListWindow != m_config.popupRaceListWindow) {
-			_DockOrPopupRaceListWindow();
-		}
 		if (prevTheme != m_config.theme) {
 			ChangeGlobalTheme(m_config.theme);
 			OnThemeChanged();
@@ -426,9 +432,6 @@ LRESULT CMainDlg::OnDockingProcess(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	};
 	if (uMsg == WM_ENTERSIZEMOVE) {
 		m_bDockingMove = false;
-		if (m_config.popupRaceListWindow) {
-			m_bDockingMove = funcDockingMove();
-		}
 	} else if (m_bDockingMove) {
 		CRect rcWindow;
 		GetWindowRect(&rcWindow);
@@ -781,42 +784,25 @@ void CMainDlg::OnEventRevision(UINT uNotifyCode, int nID, CWindow wndCtl)
 		MessageBox(L"Corrected", L"Success");
 	}
 }
+void CMainDlg::_InitRaceListWindow(){
+	INFO_LOG << L"initializing racelist windows...";
 
+	// レース一覧ウィンドウの位置を保存しておく＆非表示化
+	m_raceListWindow.ShowWindow(false);
 
-// レース一覧をメインダイアログにドッキングさせるか、ポップアップウィンドウ化させる
-void CMainDlg::_DockOrPopupRaceListWindow()
-{
-	if (!m_config.popupRaceListWindow) {
-		// docking
-		INFO_LOG << L"docking";
+	// 子ウィンドウ化
+	m_raceListWindow.ModifyStyle(WS_POPUPWINDOW | WS_CAPTION, WS_CHILD);
+	m_raceListWindow.SetParent(m_hWnd);
 
-		// レース一覧ウィンドウの位置を保存しておく＆非表示化
-		m_raceListWindow.ShowWindow(false);
-
-		// 子ウィンドウ化
-		m_raceListWindow.ModifyStyle(WS_POPUPWINDOW | WS_CAPTION, WS_CHILD);
-		m_raceListWindow.SetParent(m_hWnd);
-
-		// RaceListWindowの位置を調節
-		CRect rcShowHideButton;
-		GetDlgItem(IDC_BUTTON_SHOWHIDE_RACELIST).GetClientRect(&rcShowHideButton);
-		GetDlgItem(IDC_BUTTON_SHOWHIDE_RACELIST).MapWindowPoints(m_hWnd, &rcShowHideButton);
-		m_raceListWindow.SetWindowPos(NULL, rcShowHideButton.right, 0, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-	} else {	
-		// popup
-		INFO_LOG << L"popup";
-
-		// ポップアップウィンドウ化
-		m_raceListWindow.ModifyStyle(WS_CHILD, WS_POPUPWINDOW | WS_CAPTION);
-		m_raceListWindow.SetParent(NULL);
-
-		// メインダイアログの幅を縮小させる
-		_ExtentOrShrinkWindow(false);
-	}
-	// レース一覧の表示/非表示を復元
+	// RaceListWindowの位置を調節
+	CRect rcOptGroup;
+	GetDlgItem(IDC_STATIC_OPT_GROUP).GetClientRect(&rcOptGroup);
+	GetDlgItem(IDC_STATIC_OPT_GROUP).MapWindowPoints(m_hWnd, &rcOptGroup);
+	m_raceListWindow.SetWindowPos(NULL, rcOptGroup.right, 0, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 	m_bShowRaceList = !m_bShowRaceList;
 	OnShowHideRaceList(0, 0, NULL);
 }
+
 
 // レース一覧のためにウィンドウの幅を伸ばしたり縮めたりする
 void CMainDlg::_ExtentOrShrinkWindow(bool bExtent)
@@ -827,24 +813,23 @@ void CMainDlg::_ExtentOrShrinkWindow(bool bExtent)
 	int windowWidth = 0;
 	if (bExtent) {
 		ATLASSERT(IsChild(m_raceListWindow));
-		CRect rcClientGroup;
+		CRect rcRaceListGroup;
 		CWindow wndRaceListGroup = m_raceListWindow.GetDlgItem(IDC_STATIC_RACELIST_GROUP);
-		wndRaceListGroup.GetClientRect(&rcClientGroup);
-		wndRaceListGroup.MapWindowPoints(m_hWnd, &rcClientGroup);
-		windowWidth = rcClientGroup.right;
-
+		wndRaceListGroup.GetClientRect(&rcRaceListGroup);
+		wndRaceListGroup.MapWindowPoints(m_hWnd, &rcRaceListGroup);
+		windowWidth = rcRaceListGroup.right;
 		m_raceListWindow.SetWindowPos(NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 	} else {
-		CRect rcCtrl;
-		GetDlgItem(IDC_BUTTON_SHOWHIDE_RACELIST).GetClientRect(&rcCtrl);
-		GetDlgItem(IDC_BUTTON_SHOWHIDE_RACELIST).MapWindowPoints(m_hWnd, &rcCtrl);
-		windowWidth = rcCtrl.right;
-
+		CRect rcOptGroup;
+		GetDlgItem(IDC_STATIC_OPT_GROUP).GetClientRect(&rcOptGroup);
+		GetDlgItem(IDC_STATIC_OPT_GROUP).MapWindowPoints(m_hWnd, &rcOptGroup);
+		windowWidth = rcOptGroup.right;
 		m_raceListWindow.SetWindowPos(NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_HIDEWINDOW);
 	}
 	//AdjustWindowRectEx(&rcCtrl, GetStyle(), FALSE, GetExStyle());
-	enum { kRightMargin = 23 };
-	windowWidth += kRightMargin;
+
+	enum { kMargin = 24 };
+	windowWidth += kMargin;
 	SetWindowPos(NULL, 0, 0, windowWidth, rcWindow.Height(), SWP_NOMOVE | SWP_NOZORDER);
 }
 
@@ -859,5 +844,72 @@ void CMainDlg::_UpdateEventOptions(const UmaEventLibrary::UmaEvent& umaEvent)
 
 	}
 }
+
+void CMainDlg::_CheckUmaLibrary()
+{
+	try {
+		std::ifstream ifs((GetExeDirectory() / L"UmaLibrary" / "Common.json").wstring());
+		ATLASSERT(ifs);
+		if (!ifs) {
+			MessageBox(L"Load failed:Common.json");
+			return;
+		}
+		json jsonCommon;
+		ifs >> jsonCommon;
+		std::string libraryURL = jsonCommon["Common"]["UmaMusumeLibrary"]["URL"];
+
+		// ファイルサイズ取得
+		auto umaLibraryPath = GetExeDirectory() / L"UmaLibrary" / L"UmaMusumeLibrary.json";
+		const DWORD umaLibraryFileSize = static_cast<DWORD>(fs::file_size(umaLibraryPath));
+
+		CUrl downloadUrl(libraryURL.c_str());
+		auto hConnect = HttpConnect(downloadUrl);
+		auto hRequest = HttpOpenRequest(downloadUrl, hConnect, L"HEAD");
+		if (HttpSendRequestAndReceiveResponse(hRequest)) {
+			int statusCode = HttpQueryStatusCode(hRequest);
+			if (statusCode == 200) {
+				DWORD contentLength = 0;
+				HttpQueryHeaders(hRequest, WINHTTP_QUERY_CONTENT_LENGTH, contentLength);
+				if (umaLibraryFileSize != contentLength) {	// ファイルサイズ比較
+					if(MessageBox(L"A new version of the data file is now available!\nUpdate now?", L"Update", MB_ICONINFORMATION|MB_YESNO)==IDYES)
+					{
+						auto optDLData = HttpDownloadData(downloadUrl.GetURL());
+						if (optDLData) {
+							fs::remove(umaLibraryPath);
+							SaveFile(umaLibraryPath, optDLData.get());
+							if(MessageBox(L"New data will take effect at next time!\nExit now?", L"Success", MB_ICONINFORMATION|MB_YESNO)==IDYES){
+								exit(0);
+							}
+							return;
+						} else {
+							MessageBox(L"Download failed...", L"Error", MB_ICONERROR);
+							return;
+						}
+					}
+					else {
+						return;
+					}
+				} else {
+					return;
+				}
+			} else {
+				CString errorText;
+				errorText.Format(L"The server returned an error.\nStatus code: %d", statusCode);
+				MessageBox(errorText, L"Error", MB_ICONERROR);
+				return;
+			}
+		} else {
+			MessageBox(L"Failed to send the request.\nSee details on info.log.", L"Error", MB_ICONERROR);
+			return;
+		}
+	} catch (boost::exception& e) {
+		std::string expText = boost::diagnostic_information(e);
+		ERROR_LOG << L"CheckUmaLibrary exception: " << (LPCWSTR)CA2W(expText.c_str());
+		int a = 0;
+	}
+	ATLASSERT(FALSE);
+	MessageBox(L"An error has occurred...", L"Error", MB_ICONERROR);
+}
+
 
 

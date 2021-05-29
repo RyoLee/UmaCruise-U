@@ -289,12 +289,12 @@ LRESULT RaceListWindow::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 		lvc.iSubItem = nItem;
 		m_raceListView.InsertColumn(nItem, &lvc);
 	};
-	funcAddColumn(L"Date", 0, 120);
-	funcAddColumn(L"Race", 1, 144);
-	funcAddColumn(L"Distance", 2, 110);
-	funcAddColumn(L"Ground", 3, 42);
-	funcAddColumn(L"Direction", 4, 38);
-	funcAddColumn(L"Racetrack", 5, 58);
+	funcAddColumn(L"Date", 0, 170);
+	funcAddColumn(L"Race", 1, 120);
+	funcAddColumn(L"Distance", 2, 130);
+	funcAddColumn(L"Ground", 3, 28);
+	funcAddColumn(L"Direction", 4, 28);
+	funcAddColumn(L"Racetrack", 5, 46);
 
 	// 設定読み込み
 	{

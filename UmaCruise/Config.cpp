@@ -26,8 +26,8 @@ bool Config::LoadConfig()
 
 	refreshInterval = jsonSetting["Config"].value("RefreshInterval", refreshInterval);
 	autoStart = jsonSetting["Config"].value("AutoStart", autoStart);
+	autoCheckDB = jsonSetting["Config"].value("AutoCheckDB", autoCheckDB);
 	stopUpdatePreviewOnTraining = jsonSetting["Config"].value("StopUpdatePreviewOnTraining", stopUpdatePreviewOnTraining);
-	popupRaceListWindow = jsonSetting["Config"].value("PopupRaceListWindow", popupRaceListWindow);
 	notifyFavoriteRaceHold = jsonSetting["Config"].value("NotifyFavoriteRaceHold", notifyFavoriteRaceHold);
 	theme = jsonSetting["Config"].value("Theme", theme);
 
@@ -45,8 +45,8 @@ void Config::SaveConfig()
 
 	jsonSetting["Config"]["RefreshInterval"] = refreshInterval;
 	jsonSetting["Config"]["AutoStart"] = autoStart;
+	jsonSetting["Config"]["AutoCheckDB"] = autoCheckDB;
 	jsonSetting["Config"]["StopUpdatePreviewOnTraining"] = stopUpdatePreviewOnTraining;
-	jsonSetting["Config"]["PopupRaceListWindow"] = popupRaceListWindow;
 	jsonSetting["Config"]["NotifyFavoriteRaceHold"] = notifyFavoriteRaceHold;
 	jsonSetting["Config"]["Theme"] = theme;
 

@@ -1,7 +1,6 @@
 {
     "Common": {
         "UmaMusumeLibrary": {
-            "AutoCheck": true,
             "URL": "https://cdn.jsdelivr.net/gh/RyoLee/UmaUmaCruise-db-urarawin@master/UmaMusumeLibrary.json"
         },
         "TargetWindow": {

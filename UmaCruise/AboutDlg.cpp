@@ -103,10 +103,15 @@ LRESULT CAboutDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	CenterWindow(GetParent());
 
 	CWindow wndStaticAbout = GetDlgItem(IDC_STATIC_ABOUT);
+	CWindow wndStaticExtra = GetDlgItem(IDC_STATIC_EX);
 	CString about;
+	CString extra;
 	wndStaticAbout.GetWindowText(about);
-	about.Replace(L"{version}", kAppVersion);
+	about.Replace(L"{version}", oAppVersion);
+	wndStaticExtra.GetWindowText(extra);
+	extra.Replace(L"{version}", kAppVersion);
 	wndStaticAbout.SetWindowText(about);
+	wndStaticExtra.SetWindowText(extra);
 
 	m_cmbTestBounds = GetDlgItem(IDC_COMBO_TESTBOUNDS);
 	m_editResult = GetDlgItem(IDC_EDIT_RESULT);

@@ -16,7 +16,8 @@ class PreviewWindow;
 #define	DEBUG_STRING
 #endif
 
-constexpr LPCWSTR	kAppVersion = L"v1.8sp1" DEBUG_STRING;
+constexpr LPCWSTR	kAppVersion = L"v1.8-sp2" DEBUG_STRING;
+constexpr LPCWSTR	oAppVersion = L"v1.8" 	 DEBUG_STRING;
 
 class CAboutDlg : public CDialogImpl<CAboutDlg>, DarkModeUI<CAboutDlg>
 {

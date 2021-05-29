@@ -64,6 +64,7 @@ public:
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
 		COMMAND_ID_HANDLER(ID_APP_ABOUT, OnAppAbout)
 		COMMAND_ID_HANDLER_EX(IDC_BUTTON_SHOWHIDE_RACELIST, OnShowHideRaceList)
+		COMMAND_ID_HANDLER_EX(IDC_BUTTON_SHOWHIDE_EXOPTS, OnShowHideExOpts)
 		COMMAND_ID_HANDLER(IDCANCEL, OnCancel)
 		COMMAND_ID_HANDLER_EX(IDC_BUTTON_CONFIG, OnShowConfigDlg)
 		COMMAND_ID_HANDLER_EX(IDC_BUTTON_PREVIEW, OnShowPreviewWindow)
@@ -99,6 +100,7 @@ public:
 
 	LRESULT OnAppAbout(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	void	OnShowHideRaceList(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void	OnShowHideExOpts(UINT uNotifyCode, int nID, CWindow wndCtl);
 
 	LRESULT OnCancel(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	void	OnShowConfigDlg(UINT uNotifyCode, int nID, CWindow wndCtl);
@@ -118,13 +120,14 @@ public:
 	void OnEventRevision(UINT uNotifyCode, int nID, CWindow wndCtl);
 
 private:
-	void	_DockOrPopupRaceListWindow();
+	void	_InitRaceListWindow();
 	void	_ExtentOrShrinkWindow(bool bExtent);
-
+	void	_ShowHideExOpts(bool bExtent);
 	void	_UpdateEventOptions(const UmaEventLibrary::UmaEvent& umaEvent);
-
+	void 	_CheckUmaLibrary();
 	Config	m_config;
 	bool	m_bShowRaceList = true;
+	bool	m_bShowExOpts = true;
 
 	UmaEventLibrary	m_umaEventLibrary;
 	UmaTextRecognizer	m_umaTextRecoginzer;
