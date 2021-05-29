@@ -43,11 +43,15 @@
 #define IDC_SYSLINK_VERSIONCHECK        1043
 #define IDC_COMBO1                      1044
 #define IDC_COMBO_THEME                 1044
-#define IDC_RICHEDIT21                  1045
 #define IDC_STATIC_EX                   1046
 #define IDC_BUTTON_SHOWHIDE_EXOPTS      1046
 #define IDC_STATIC_OPT_GROUP            1047
 #define IDC_CHECK_AUTOUPDATE            1048
+#define IDC_RICHEDIT21                  1049
+#define IDC_RICHEDIT22                  1050
+#define IDC_RICHEDIT23                  1051
+#define IDC_RICHEDIT24                  1052
+#define IDC_RICHEDIT25                  1053
 #define IDC_EDIT_OPTION1                1500
 #define IDC_EDIT_OPTION2                1501
 #define IDC_EDIT_OPTION3                1502
@@ -88,7 +92,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        210
 #define _APS_NEXT_COMMAND_VALUE         32775
-#define _APS_NEXT_CONTROL_VALUE         1046
+#define _APS_NEXT_CONTROL_VALUE         1054
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

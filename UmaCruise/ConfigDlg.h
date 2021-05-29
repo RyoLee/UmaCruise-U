@@ -18,8 +18,8 @@ public:
 	BEGIN_DDX_MAP(ConfigDlg)
 		DDX_CONTROL_HANDLE(IDC_COMBO_REFRESHINTERVAL, m_cmbRefreshInterval)
 		DDX_CHECK(IDC_CHECK_AUTOSTART, m_autoStart)
-		DDX_CHECK(IDC_CHECK_AUTOUPDATE, m_autoCheckDB)
 		DDX_CHECK(IDC_CHECK_STOPUPDATEPREVIEWONTRAINING, m_stopUpdatePreviewOnTraining)
+		DDX_CHECK(IDC_CHECK_AUTOUPDATE, m_autoCheckDB)
 		DDX_CHECK(IDC_CHECK_NOTIFY_FAVORITERACEHOLD, m_notifyFavoriteRaceHold)
 		DDX_COMBO_INDEX(IDC_COMBO_THEME, m_theme)
 	END_DDX_MAP()
@@ -47,8 +47,8 @@ private:
 
 	CComboBox	m_cmbRefreshInterval;
 	bool	m_autoStart = false;
-	bool	m_autoCheckDB = true;
 	bool	m_stopUpdatePreviewOnTraining = false;
+	bool	m_autoCheckDB = true;
 	bool	m_notifyFavoriteRaceHold = true;
 	int		m_theme = Config::kAuto;
 

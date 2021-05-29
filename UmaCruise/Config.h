@@ -4,8 +4,8 @@ struct Config
 {
 	int		refreshInterval = 1;
 	bool	autoStart = false;
-	bool 	autoCheckDB = true;
 	bool	stopUpdatePreviewOnTraining = false;
+	bool 	autoCheckDB = true;
 	bool	notifyFavoriteRaceHold = true;
 	enum Theme {
 		kAuto, kDark, kLight,

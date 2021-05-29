@@ -87,7 +87,8 @@ bool UmaEventLibrary::LoadUmaMusumeLibrary()
 
 					if (kMaxOption <= i) {
 						ATLASSERT(FALSE);
-						throw std::runtime_error("The number of options is out of range(kMaxOption).");
+						ERROR_LOG << L"The number of options is out of range(kMaxOption)." << eventName;
+						break;
 					}
 
 					umaEvent.eventOptions[i].option = option;
