@@ -473,8 +473,8 @@ void RaceListWindow::OnRaceFilterChanged(UINT uNotifyCode, int nID, CWindow wndC
 	const bool bShift = ::GetKeyState(VK_SHIFT) < 0;
 	if (bShift) {
 		const bool checked = CButton(GetDlgItem(nID)).GetCheck() == BST_CHECKED;
-		if (IDC_CHECK_G1 <= nID && nID <= IDC_CHECK_G3) {
-			m_gradeG1 = m_gradeG2 = m_gradeG3 = checked;
+		if (IDC_CHECK_G1 <= nID && nID <= IDC_CHECK_PREOP) {
+			m_gradeG1 = m_gradeG2 = m_gradeG3 = m_gradeOP = m_gradePreOP =  checked;
 		} else if (IDC_CHECK_SPRINT <= nID && nID <= IDC_CHECK_LONG) {
 			m_sprint = m_mile = m_middle = m_long = checked;
 		} else if (IDC_CHECK_GRASS <= nID && nID <= IDC_CHECK_DART) {
@@ -567,6 +567,8 @@ int32_t RaceListWindow::_GetRaceMatchState()
 	state |= m_gradeG1 ? RaceDateLibrary::Race::Grade::kG1 : 0;
 	state |= m_gradeG2 ? RaceDateLibrary::Race::Grade::kG2 : 0;
 	state |= m_gradeG3 ? RaceDateLibrary::Race::Grade::kG3 : 0;
+	state |= m_gradeOP ? RaceDateLibrary::Race::Grade::kOP : 0;
+	state |= m_gradePreOP ? RaceDateLibrary::Race::Grade::kPreOP : 0;
 
 	state |= m_sprint ? RaceDateLibrary::Race::DistanceClass::kSprint : 0;
 	state |= m_mile ? RaceDateLibrary::Race::DistanceClass::kMile : 0;
@@ -595,6 +597,8 @@ void RaceListWindow::_SetRaceMatchState(int32_t state)
 	m_gradeG1 = (state & RaceDateLibrary::Race::kG1) != 0;
 	m_gradeG2 = (state & RaceDateLibrary::Race::kG2) != 0;
 	m_gradeG3 = (state & RaceDateLibrary::Race::kG3) != 0;
+	m_gradeOP = (state & RaceDateLibrary::Race::kOP) != 0;
+	m_gradePreOP = (state & RaceDateLibrary::Race::kPreOP) != 0;
 
 	m_sprint = (state & RaceDateLibrary::Race::kSprint) != 0;
 	m_mile = (state & RaceDateLibrary::Race::kMile) != 0;

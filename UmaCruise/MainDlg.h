@@ -9,6 +9,7 @@
 
 #include "UmaEventLibrary.h"
 #include "RaceDateLibrary.h"
+#include "SkillLibrary.h"
 #include "UmaTextRecognizer.h"
 
 #include "resource.h"
@@ -148,11 +149,13 @@ private:
 	bool	m_bShowExOpts = true;
 
 	UmaEventLibrary	m_umaEventLibrary;
+	SkillLibrary	m_skillLibrary;
 	UmaTextRecognizer	m_umaTextRecoginzer;
 
 	PreviewWindow	m_previewWindow;
 	RaceListWindow	m_raceListWindow;
 
+	CFont gFont;
 	CString	m_targetWindowName;
 	CString m_targetClassName;
 

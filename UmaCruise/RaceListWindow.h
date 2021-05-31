@@ -47,6 +47,8 @@ public:
 		DDX_CHECK(IDC_CHECK_G1, m_gradeG1)
 		DDX_CHECK(IDC_CHECK_G2, m_gradeG2)
 		DDX_CHECK(IDC_CHECK_G3, m_gradeG3)
+		DDX_CHECK(IDC_CHECK_OP, m_gradeOP)
+		DDX_CHECK(IDC_CHECK_PREOP, m_gradePreOP)
 
 		DDX_CHECK(IDC_CHECK_SPRINT, m_sprint)
 		DDX_CHECK(IDC_CHECK_MILE, m_mile)
@@ -125,6 +127,8 @@ private:
 	bool	m_gradeG1 = true;
 	bool	m_gradeG2 = true;
 	bool	m_gradeG3 = true;
+	bool	m_gradeOP = true;
+	bool	m_gradePreOP = true;
 
 	bool	m_sprint = true;
 	bool	m_mile = true;

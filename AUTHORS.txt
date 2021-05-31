@@ -1,6 +1,6 @@
 
 ===============================================
-・bootstrap
+·bootstrap
 
 The MIT License (MIT)
 
@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 
 =================================================
-・opencv
+·opencv
 
                           License Agreement
                For Open Source Computer Vision Library
@@ -69,7 +69,7 @@ or tort (including negligence or otherwise) arising in any way out of
 the use of this software, even if advised of the possibility of such damage.
 
 =================================================
-・tesseract OCR
+·tesseract OCR
 
 
                                  Apache License
@@ -275,7 +275,7 @@ the use of this software, even if advised of the possibility of such damage.
    limitations under the License.
    
 =================================================
-・SimString
+·SimString
 
 The BSD license.
 
@@ -306,7 +306,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ===========================================================================
-・JSON for Modern C++  
+·JSON for Modern C++  
 
 MIT License 
 
@@ -331,7 +331,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ===========================================================================
-・WTL
+·WTL
 
 Microsoft Public License (MS-PL)
 
@@ -357,7 +357,7 @@ A "contributor" is any person that distributes its contribution under this licen
 (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular purpose and non-infringement.
 
 ===========================================================================
-・win32-darkmode 
+·win32-darkmode 
 
 MIT License
 

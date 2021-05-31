@@ -62,9 +62,11 @@
 #define IDC_EDIT_EFFECT3                1512
 #define IDC_EDIT_EFFECT4                1513
 #define IDC_EDIT_EFFECT5                1514
-#define IDC_CHECK_G1                    1618
-#define IDC_CHECK_G2                    1619
-#define IDC_CHECK_G3                    1620
+#define IDC_CHECK_G1                    1616
+#define IDC_CHECK_G2                    1617
+#define IDC_CHECK_G3                    1618
+#define IDC_CHECK_OP                    1619
+#define IDC_CHECK_PREOP                 1620
 #define IDC_CHECK_SPRINT                1621
 #define IDC_CHECK_MILE                  1622
 #define IDC_CHECK_MIDDLE                1623

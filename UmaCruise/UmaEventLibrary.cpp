@@ -87,7 +87,7 @@ bool UmaEventLibrary::LoadUmaMusumeLibrary()
 
 					if (kMaxOption <= i) {
 						ATLASSERT(FALSE);
-						ERROR_LOG << L"The number of options is out of range(kMaxOption)." << eventName;
+						ERROR_LOG << L"The number of options is out of range(kMaxOption): " << eventName;
 						break;
 					}
 
@@ -127,17 +127,6 @@ bool UmaEventLibrary::LoadUmaMusumeLibrary()
 			funcLoad(jsonLibrary, "Support", m_supportEventList);
 			// R->SR->SSRと読み込まれるので SSR->SR->R順に逆転しておく
 			std::reverse(m_supportEventList.begin(), m_supportEventList.end());			
-		}
-		{	// UmaMusumeLibraryMainStory.json
-			std::ifstream ifs((GetExeDirectory() / L"UmaLibrary" / "UmaMusumeLibraryMainStory.json").wstring());
-			ATLASSERT(ifs);
-			if (!ifs) {
-				throw std::runtime_error("Load failed:UmaMusumeLibraryMainStory.json");
-			}
-			json jsonLibrary;
-			ifs >> jsonLibrary;
-
-			funcLoad(jsonLibrary, "MainStory", m_supportEventList);
 		}
 		{	// UmaMusumeLibraryRevision.json
 			std::ifstream ifs((GetExeDirectory() / L"UmaLibrary" / "UmaMusumeLibraryRevision.json").wstring());
@@ -268,8 +257,8 @@ boost::optional<UmaEventLibrary::UmaEvent> UmaEventLibrary::AmbiguousSearchEvent
 		event1.eventName != event2.eventName) 
 	{
 		WARN_LOG << L"AmbiguousSearchEvent Event name mismatch\n"
-			<< L"・From the event 1: [" << event1.eventName << L"] (" << ambiguousEventNames.front() << L")\n"
-			<< L"・From the bottom 2: [" << event2.eventName << L"] (" << ambiguousEventBottomOptions.front() << L")";
+			<< L"·From the event 1: [" << event1.eventName << L"] (" << ambiguousEventNames.front() << L")\n"
+			<< L"·From the bottom 2: [" << event2.eventName << L"] (" << ambiguousEventBottomOptions.front() << L")";
 	}
 
 	if (optOptionResult) {	// 選択肢からの検索を優先する

@@ -295,7 +295,7 @@ bool UmaTextRecognizer::TextRecognizer(Gdiplus::Bitmap* image)
 		return textImage;
 	};
 	{	// イベント名
-		//INFO_LOG << L"・イベント名";
+		//INFO_LOG << L"·イベント名";
 
 		// asyncに渡す関数オブジェクト
 		auto asyncTextFromImage = [this](cv::Mat& image, std::shared_ptr<TextFromImageFunc> funcTextFromImage) -> std::wstring {
@@ -343,7 +343,7 @@ bool UmaTextRecognizer::TextRecognizer(Gdiplus::Bitmap* image)
 
 		// イベント選択肢
 		{
-			//INFO_LOG << L"・イベント選択肢";
+			//INFO_LOG << L"·イベント選択肢";
 			CRect rcEventBottomOption = _AdjustBounds(srcImage, m_testBounds[kEventBottomOptionBounds]);
 			cv::Mat cutImage(srcImage, cvRectFromCRect(rcEventBottomOption));
 
@@ -412,7 +412,7 @@ bool UmaTextRecognizer::TextRecognizer(Gdiplus::Bitmap* image)
 			}
 		}
 
-		INFO_LOG << L"・Training" << timer.format();
+		INFO_LOG << L"·Training" << timer.format();
 	}
 	{	// 現在の日付
 		Utility::timer timer;
@@ -442,7 +442,7 @@ bool UmaTextRecognizer::TextRecognizer(Gdiplus::Bitmap* image)
 #endif
 			//INFO_LOG << L"CurrentTurn, cut: " << cutImageText << L" thres: " << thresImageText;
 		}
-		INFO_LOG << L"・Current date" << timer.format() << L" (" << invertedText << L")";
+		INFO_LOG << L"·Current date" << timer.format() << L" (" << invertedText << L")";
 	}
 	{	// 現在メニュー[トレーニング]
 		Utility::timer timer;
@@ -467,7 +467,7 @@ bool UmaTextRecognizer::TextRecognizer(Gdiplus::Bitmap* image)
 				m_bTrainingMenu = true;
 			}
 		}
-		INFO_LOG << L"・Training" << timer.format();;
+		INFO_LOG << L"·Training" << timer.format();;
 	}
 	{
 		// レース詳細
@@ -506,7 +506,7 @@ bool UmaTextRecognizer::TextRecognizer(Gdiplus::Bitmap* image)
 			const double whiteRatio = ImageWhiteRatio(thresImage2);
 			// 戻るボタン が見つからなければ[レース予約完了]ダイアログではない
 			if (whiteRatio < kMinWhiteTextRatioThreshold) {	
-				INFO_LOG << L"・Race details" << timer.format() << L" (" << invertedText << L")";
+				INFO_LOG << L"·Race details" << timer.format() << L" (" << invertedText << L")";
 
 				std::wregex rx(LR"((\d+)m)");
 				std::wsmatch result;

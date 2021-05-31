@@ -15,41 +15,43 @@ public:
 			kG1 = 1 << 0,
 			kG2 = 1 << 1,
 			kG3 = 1 << 2,
+			kOP = 1 << 3,
+			kPreOP = 1 << 4,
 		};
-		Grade			grade;				// G1・G2・G3
+		Grade			grade;				// G1·G2·G3·OP·Pre-OP
 		std::wstring	name;				// レース名
 		enum GroundCondition {
-			kGrass = 1 << 3,
-			kDart  = 1 << 4,
+			kGrass = 1 << 5,
+			kDart  = 1 << 6,
 		};
-		GroundCondition	groundCondition;	// 芝・ダート
+		GroundCondition	groundCondition;	// 芝·ダート
 		enum DistanceClass {
-			kSprint = 1 << 5,
-			kMile	= 1 << 6,
-			kMiddle	= 1 << 7,
-			kLong	= 1 << 8,
+			kSprint = 1 << 7,
+			kMile	= 1 << 8,
+			kMiddle	= 1 << 9,
+			kLong	= 1 << 10,
 		};
-		DistanceClass	distanceClass;		// 短距離・マイル・中距離・長距離
+		DistanceClass	distanceClass;		// 短距離·マイル·中距離·長距離
 		std::wstring	distance;			// 上の実際の距離数
 		enum Rotation {
-			kRight	= 1 << 9, 
-			kLeft	= 1 << 10,
-			kLine	= 1 << 11,
+			kRight	= 1 << 11, 
+			kLeft	= 1 << 12,
+			kLine	= 1 << 13,
 		};
-		Rotation		rotation;			// 右・左回り・直線
+		Rotation		rotation;			// 右·左回り·直線
 		std::wstring	location;			// 場所
 		enum Location {
-			kSapporo	= 1 << 12,
-			kHakodate	= 1 << 13,
-			kHukusima	= 1 << 14,
-			kNiigata	= 1 << 15,
-			kTokyo		= 1 << 16,
-			kNakayama	= 1 << 17,
-			kTyuukyou	= 1 << 18,
-			kKyoto		= 1 << 19,
-			kHanshin	= 1 << 20,
-			kOgura		= 1 << 21,
-			kOoi		= 1 << 22,
+			kSapporo	= 1 << 14,
+			kHakodate	= 1 << 15,
+			kHukusima	= 1 << 16,
+			kNiigata	= 1 << 17,
+			kTokyo		= 1 << 18,
+			kNakayama	= 1 << 19,
+			kTyuukyou	= 1 << 20,
+			kKyoto		= 1 << 21,
+			kHanshin	= 1 << 22,
+			kOgura		= 1 << 23,
+			kOoi		= 1 << 24,
 			kMaxLocationCount = 11,
 		};
 		Location		locationFlag;
@@ -65,7 +67,7 @@ public:
 		bool	IsMatchState(int32_t state);
 	};
 
-	// RaceDataLibrary.json を読み込む
+	// RaceDataLibrary を読み込む
 	bool	LoadRaceDataLibrary();
 
 	// 全ターンリスト
@@ -88,7 +90,7 @@ private:
 	void	_InitDB();
 
 	std::wstring	m_currentTurn;
-	int		m_searchCount = 0;	// 逆行・遡行防止のため
+	int		m_searchCount = 0;	// 逆行·遡行防止のため
 
 	std::vector<std::wstring> m_allTurnList;
 

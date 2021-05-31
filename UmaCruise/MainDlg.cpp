@@ -2,6 +2,8 @@
 #include "stdafx.h"
 #include "MainDlg.h"
 
+#include <regex>
+#include <unordered_set>
 #include <tesseract\baseapi.h>
 #include <leptonica\allheaders.h>
 
@@ -138,6 +140,18 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 		m_brsOptions[i].CreateSolidBrush(m_optionBkColor[i]);
 	}
 
+	// set fond
+	gFont.CreatePointFont(90,L"Segoe UI");
+	for (size_t i = 0; i < kMaxOptionEffect; ++i) {
+		const int IDC_EFFECT = IDC_EDIT_EFFECT1 + i;
+		const int IDC_OPTION = IDC_EDIT_OPTION1 + i;
+		GetDlgItem(IDC_EFFECT).SetFont(gFont);
+		GetDlgItem(IDC_OPTION).SetFont(gFont);
+	}
+	GetDlgItem(IDC_COMBO_UMAMUSUME).SetFont(gFont);
+	GetDlgItem(IDC_EDIT_EVENT_SOURCE).SetFont(gFont);
+	GetDlgItem(IDC_EDIT_EVENTNAME).SetFont(gFont);
+
 	// デフォルトフォント取得
 	CEdit edit = GetDlgItem(IDC_EDIT_OPTION1);
 	HFONT font = edit.GetFont();
@@ -178,6 +192,12 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 			}
 			m_cmbUmaMusume.AddString(uma->name.c_str());
 		}
+	}
+
+	// SkillLibraryを読み込み
+	if (!m_skillLibrary.LoadSkillLibrary()) {
+		ERROR_LOG << L"LoadSkillLibrary failed";
+		ATLASSERT(FALSE);
 	}
 
 	if (!m_umaTextRecoginzer.LoadSetting()) {
@@ -241,6 +261,7 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 		_InitRaceListWindow();
 
 		DoDataExchange(DDX_LOAD);
+
 	} catch (std::exception& e)
 	{
 		ATLTRACE(L"%s\n", (LPCWSTR)(CA2W(e.what())));
@@ -248,6 +269,7 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 		ATLASSERT(FALSE);
 	}
 	ChangeWindowTitle(L"init suscess!");
+
 	if (m_config.autoStart) {
 		CButton(GetDlgItem(IDC_CHECK_START)).SetCheck(BST_CHECKED);
 		OnStart(0, 0, NULL);
@@ -865,6 +887,7 @@ BOOL CMainDlg::OnSetCursor(CWindow wnd, UINT nHitTest, UINT message)
 				rcEditDesktop.right = max(static_cast<int>(rcEditDesktop.right), rcClient.Width());
 
 				m_popupRichEdit.SetOriginalEffectRichEditRect(rcClient);
+				m_popupRichEdit.SetEventName(m_eventName);
 
 				// テキストコピー
 				m_popupRichEdit.SetOriginalEffectRichEdit(richEdit);
@@ -880,11 +903,9 @@ BOOL CMainDlg::OnSetCursor(CWindow wnd, UINT nHitTest, UINT message)
 		}
 	}
 	if (::GetFocus() != m_popupRichEdit.GetRichEdit() && m_popupRichEdit.GetOriginalEffectRichEdit()) {
+
 		// 効果テキスト取得
-		CString text;
-		m_popupRichEdit.GetRichEdit().GetWindowText(text.GetBuffer(kMaxEffectTextLength), kMaxEffectTextLength);
-		text.ReleaseBuffer();
-		text.Trim();
+		CString text = m_popupRichEdit.GetEffectText(m_eventName);
 		if (text.GetLength()) {
 			// フォーカスを失う前に、ポップアップリッチエディットに書き込まれた内容を元のリッチエディットに書き戻す
 			_UpdateEventEffect(m_popupRichEdit.GetOriginalEffectRichEdit(), (LPCWSTR)text);
@@ -913,7 +934,6 @@ void CMainDlg::_InitRaceListWindow(){
 	m_bShowRaceList = !m_bShowRaceList;
 	OnShowHideRaceList(0, 0, NULL);
 }
-
 
 // レース一覧のためにウィンドウの幅を伸ばしたり縮めたりする
 void CMainDlg::_ExtentOrShrinkWindow(bool bExtent)
@@ -999,12 +1019,37 @@ void CMainDlg::_UpdateEventEffect(CRichEditCtrl richEdit, const std::wstring& ef
 			ft.chrg.cpMin = ft.chrgText.cpMax;	// 次へ
 		}
 	};
+
+	// 獲得スキルの詳細を追記する
+	constexpr LPCWSTR kSkillDetailHeader = L"=====Skill effect=====";
+	constexpr LPCWSTR kSkillSeparetor = L"····················";
+	if (effectText.find(kSkillDetailHeader) == std::wstring::npos) {
+		std::unordered_set<std::wstring> setSkillName;
+		bool bFirst = true;
+		std::wregex rx(LR"(『(.+?)』)");
+		for (std::wsregex_iterator it(effectText.begin(), effectText.end(), rx), end; it != end; ++it) {
+			std::wstring skillName = it->str(1);
+			INFO_LOG << L"Finding:" << skillName;
+			if (setSkillName.find(skillName) != setSkillName.end()) {
+				continue;	// 同じスキル名は追加しない
+			}
+
+			if (auto optSkillEffect = m_skillLibrary.SearchSkillEffect(skillName)) {
+				CString appendText;
+				appendText.Format(L"\r\n%s\r\n[%s]\r\n%s",
+					bFirst ? kSkillDetailHeader : kSkillSeparetor, skillName.c_str(), optSkillEffect->c_str());
+				bFirst = false;
+				richEdit.AppendText(appendText);
+				setSkillName.insert(skillName);
+			}
+		}
+	}
+
 	// ステータス上昇降下へ色を付ける
 	funcChangeTextColor(richEdit, L"+", m_effectStatusInc);
 	funcChangeTextColor(richEdit, L"-", m_effectStatusDec);
+	
 	richEdit.SetSel(0, 0);
-
-	// ToDo: 獲得スキルの詳細を追記する
 }
 void CMainDlg::_CheckUmaLibrary()
 {

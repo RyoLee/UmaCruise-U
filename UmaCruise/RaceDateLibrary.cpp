@@ -34,10 +34,10 @@ bool RaceDateLibrary::LoadRaceDataLibrary()
 	ATLASSERT(m_allTurnList.size());
 	m_turnOrderedRaceList.resize(m_allTurnList.size());
 
-	std::ifstream ifs((GetExeDirectory() / L"UmaLibrary" / L"RaceDataLibrary.json").wstring());
+	std::ifstream ifs((GetExeDirectory() / L"UmaLibrary" / L"UmaMusumeLibrary.json").wstring());
 	ATLASSERT(ifs);
 	if (!ifs) {
-		throw std::runtime_error("Load failed:RaceDataLibrary.json");
+		throw std::runtime_error("Load failed:RaceDataLibrary");
 	}
 	json jsonLibrary;
 	ifs >> jsonLibrary;
@@ -49,6 +49,10 @@ bool RaceDateLibrary::LoadRaceDataLibrary()
 			return Race::Grade::kG2;
 		} else if (text == "G3") {
 			return Race::Grade::kG3;
+		} else if (text == "OP") {
+			return Race::Grade::kOP;
+		} else if (text == "Pre-OP") {
+			return Race::Grade::kPreOP;
 		} else {
 			ATLASSERT(FALSE);
 			throw std::runtime_error("gradeText is not grade");
@@ -83,7 +87,7 @@ bool RaceDateLibrary::LoadRaceDataLibrary()
 			return Race::Rotation::kRight;
 		} else if (text == u8"左") {
 			return Race::Rotation::kLeft;
-		} else if (text == u8"直線") {
+		} else if (text == u8"直") {
 			return Race::Rotation::kLine;
 		} else {
 			ATLASSERT(FALSE);
@@ -265,6 +269,10 @@ std::wstring RaceDateLibrary::Race::RaceName() const
 		return L"G2 " + name;
 	case kG3:
 		return L"G3 " + name;
+	case kOP:
+		return L"OP " + name;
+	case kPreOP:
+		return L"Pre-OP " + name;
 	default:
 		ATLASSERT(FALSE);
 	}
@@ -309,7 +317,7 @@ std::wstring RaceDateLibrary::Race::RotationText() const
 	case kLeft:
 		return L"左";
 	case kLine:
-		return L"直線";
+		return L"直";
 	default:
 		ATLASSERT(FALSE);
 	}
