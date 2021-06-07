@@ -144,6 +144,7 @@ private:
 	void	_UpdateEventOptions(const UmaEventLibrary::UmaEvent& umaEvent);
 	void	_UpdateEventEffect(CRichEditCtrl richEdit, const std::wstring& effectText);
 	void 	_CheckUmaLibrary();
+	void	_CheckUmaCruiseU();
 	Config	m_config;
 	bool	m_bShowRaceList = true;
 	bool	m_bShowExOpts = true;

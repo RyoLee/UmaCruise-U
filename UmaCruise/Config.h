@@ -6,6 +6,7 @@ struct Config
 	bool	autoStart = false;
 	bool	stopUpdatePreviewOnTraining = false;
 	bool 	autoCheckDB = true;
+	bool 	autoCheckUpgrade =true;
 	bool	notifyFavoriteRaceHold = true;
 	enum Theme {
 		kAuto, kDark, kLight,

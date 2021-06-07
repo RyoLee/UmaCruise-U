@@ -107,7 +107,7 @@ LRESULT CAboutDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	CString about;
 	CString extra;
 	wndStaticAbout.GetWindowText(about);
-	about.Replace(L"{version}", oAppVersion);
+	about.Replace(L"{version}", bAppVersion);
 	wndStaticExtra.GetWindowText(extra);
 	extra.Replace(L"{version}", kAppVersion);
 	wndStaticAbout.SetWindowText(about);
@@ -132,7 +132,7 @@ LRESULT CAboutDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 		std::thread([this]() {
 			CWindow wndVersionCheck = GetDlgItem(IDC_SYSLINK_VERSIONCHECK);
 
-			CString versionURL = L"https://raw.githubusercontents.com/RyoLee/UmaCruise-U/master/appversion.txt";
+			CString versionURL = L"https://cdn.jsdelivr.net/gh/RyoLee/UmaCruise-U@master/appversion.txt";
 			if (auto optVersion = WinHTTPWrapper::HttpDownloadData(versionURL)) {
 				std::wstring latestVersion = UTF16fromUTF8(optVersion.get());
 				boost::algorithm::trim_all(latestVersion);

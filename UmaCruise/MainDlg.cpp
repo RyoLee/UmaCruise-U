@@ -9,6 +9,7 @@
 
 #include <opencv2\opencv.hpp>
 
+#include <boost\algorithm\string\trim_all.hpp>
 #include "Utility\CodeConvert.h"
 #include "Utility\CommonUtility.h"
 #include "Utility\json.hpp"
@@ -22,8 +23,9 @@
 using json = nlohmann::json;
 using namespace CodeConvert;
 using namespace cv;
-using namespace WinHTTPWrapper;
 
+LPCWSTR kAppVersion = L"v1.10-sp2" DEBUG_STRING;
+LPCWSTR	bAppVersion = L"v1.10";
 
 bool IsDarkMode()
 {
@@ -123,6 +125,9 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 
 	m_config.LoadConfig();
 	
+	if(m_config.autoCheckUpgrade){
+		_CheckUmaCruiseU();
+	}
 	if(m_config.autoCheckDB){
 		_CheckUmaLibrary();
 	}
@@ -1051,6 +1056,24 @@ void CMainDlg::_UpdateEventEffect(CRichEditCtrl richEdit, const std::wstring& ef
 	
 	richEdit.SetSel(0, 0);
 }
+void CMainDlg::_CheckUmaCruiseU(){
+	CString versionURL = L"https://cdn.jsdelivr.net/gh/RyoLee/UmaCruise-U@master/appversion.txt";
+	if (auto optVersion = WinHTTPWrapper::HttpDownloadData(versionURL)) {
+		std::wstring latestVersion = UTF16fromUTF8(optVersion.get());
+		boost::algorithm::trim_all(latestVersion);
+		if (latestVersion != kAppVersion) {
+			CString msg;
+			msg.Format(L"A new version of the UmaCruise-U is available!\n\nNew:\t%s\nOld:\t%s\n\nUpdate now?", latestVersion.c_str(), kAppVersion);
+			if (MessageBox(msg, L"Update", MB_ICONINFORMATION|MB_YESNO) == IDYES) {
+				::ShellExecute(NULL, nullptr, L"https://cdn.jsdelivr.net/gh/RyoLee/UmaCruise-U@res/UmaCruise-U.7z", nullptr, nullptr, SW_NORMAL);
+				exit(0);
+			}
+		}
+	} else {
+		MessageBox(L"Download failed...", L"Error", MB_ICONERROR);
+		return;
+	}
+}
 void CMainDlg::_CheckUmaLibrary()
 {
 	try {
@@ -1068,18 +1091,18 @@ void CMainDlg::_CheckUmaLibrary()
 		auto umaLibraryPath = GetExeDirectory() / L"UmaLibrary" / L"UmaMusumeLibrary.json";
 		const DWORD umaLibraryFileSize = static_cast<DWORD>(fs::file_size(umaLibraryPath));
 
-		CUrl downloadUrl(libraryURL.c_str());
-		auto hConnect = HttpConnect(downloadUrl);
-		auto hRequest = HttpOpenRequest(downloadUrl, hConnect, L"HEAD");
-		if (HttpSendRequestAndReceiveResponse(hRequest)) {
-			int statusCode = HttpQueryStatusCode(hRequest);
+		WinHTTPWrapper::CUrl downloadUrl(libraryURL.c_str());
+		auto hConnect = WinHTTPWrapper::HttpConnect(downloadUrl);
+		auto hRequest = WinHTTPWrapper::HttpOpenRequest(downloadUrl, hConnect, L"GET");
+		if (WinHTTPWrapper::HttpSendRequestAndReceiveResponse(hRequest)) {
+			int statusCode = WinHTTPWrapper::HttpQueryStatusCode(hRequest);
 			if (statusCode == 200) {
 				DWORD contentLength = 0;
 				HttpQueryHeaders(hRequest, WINHTTP_QUERY_CONTENT_LENGTH, contentLength);
 				if (umaLibraryFileSize != contentLength) {	// ファイルサイズ比較
-					if(MessageBox(L"A new version of the data file is now available!\nUpdate now?", L"Update", MB_ICONINFORMATION|MB_YESNO)==IDYES)
+					if(MessageBox(L"A new version of the data file is available!\nUpdate now?", L"Update", MB_ICONINFORMATION|MB_YESNO)==IDYES)
 					{
-						auto optDLData = HttpDownloadData(downloadUrl.GetURL());
+						auto optDLData = WinHTTPWrapper::HttpDownloadData(downloadUrl.GetURL());
 						if (optDLData) {
 							fs::remove(umaLibraryPath);
 							SaveFile(umaLibraryPath, optDLData.get());

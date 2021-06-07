@@ -30,7 +30,7 @@ EXSTYLE WS_EX_ACCEPTFILES
 CAPTION "About"
 FONT 9, "Segoe UI", 0, 0, 0x0
 BEGIN
-    GROUPBOX        "Original",IDC_STATIC,7,6,115,94
+    GROUPBOX        "Base",IDC_STATIC,7,6,115,94
     ICON            IDR_MAINFRAME,IDC_STATIC,54,16,20,20,SS_CENTERIMAGE
     CTEXT           "UmaUmaCruise\n{version}\n\n(c) Copyright 2021 amate",IDC_STATIC_ABOUT,13,37,103,32
     CONTROL         "<a>Home Page</a>",IDC_SYSLINK_ORI_HOMEPAGE,"SysLink",WS_TABSTOP,48,74,36,10
@@ -169,17 +169,19 @@ FONT 9, "Segoe UI", 0, 0, 0x0
 BEGIN
     CONTROL         "Automatically starts scanning at startup",IDC_CHECK_AUTOSTART,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,8,200,12
-    CONTROL         "Automatically check for data updates at startup",IDC_CHECK_AUTOUPDATE,
+    CONTROL         "Automatically check for data updates at startup",IDC_CHECK_AUTOUPGREADE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,30,200,12
-    CONTROL         "Stop refreshing the preview window",IDC_CHECK_STOPUPDATEPREVIEWONTRAINING,
+    CONTROL         "Automatically check for data updates at startup",IDC_CHECK_AUTOUPDATE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,52,200,12
-    CONTROL         "Notification on the date of the reserved race",IDC_CHECK_NOTIFY_FAVORITERACEHOLD,
+    CONTROL         "Stop refreshing the preview window",IDC_CHECK_STOPUPDATEPREVIEWONTRAINING,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,74,200,12
-    LTEXT           "Interval:",IDC_STATIC,12,96,32,12
-    COMBOBOX        IDC_COMBO_REFRESHINTERVAL,44,94,30,84,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Sec",IDC_STATIC,79,96,36,12
-    LTEXT           "Theme:",IDC_STATIC,12,118,32,12
-    COMBOBOX        IDC_COMBO_THEME,44,116,30,54,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Notification on the date of the reserved race",IDC_CHECK_NOTIFY_FAVORITERACEHOLD,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,96,200,12
+    LTEXT           "Interval:",IDC_STATIC,12,118,32,12
+    COMBOBOX        IDC_COMBO_REFRESHINTERVAL,44,116,30,84,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Sec",IDC_STATIC,79,118,36,12
+    LTEXT           "Theme:",IDC_STATIC,12,140,32,12
+    COMBOBOX        IDC_COMBO_THEME,44,138,30,54,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,198,155,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,252,155,50,14
 END

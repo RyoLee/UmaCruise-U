@@ -47,11 +47,12 @@
 #define IDC_BUTTON_SHOWHIDE_EXOPTS      1046
 #define IDC_STATIC_OPT_GROUP            1047
 #define IDC_CHECK_AUTOUPDATE            1048
-#define IDC_RICHEDIT21                  1049
-#define IDC_RICHEDIT22                  1050
-#define IDC_RICHEDIT23                  1051
-#define IDC_RICHEDIT24                  1052
-#define IDC_RICHEDIT25                  1053
+#define IDC_CHECK_AUTOUPGREADE          1049
+#define IDC_RICHEDIT21                  1149
+#define IDC_RICHEDIT22                  1150
+#define IDC_RICHEDIT23                  1151
+#define IDC_RICHEDIT24                  1152
+#define IDC_RICHEDIT25                  1153
 #define IDC_EDIT_OPTION1                1500
 #define IDC_EDIT_OPTION2                1501
 #define IDC_EDIT_OPTION3                1502
@@ -98,3 +99,12 @@
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
+
+#ifdef _DEBUG
+#define	DEBUG_STRING	L"_Debug"
+#else
+#define	DEBUG_STRING
+#endif
+
+extern  LPCWSTR	kAppVersion;
+extern  LPCWSTR	bAppVersion;

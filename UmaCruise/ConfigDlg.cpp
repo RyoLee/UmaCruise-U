@@ -32,6 +32,7 @@ LRESULT ConfigDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	m_autoStart = m_config.autoStart;
 	m_stopUpdatePreviewOnTraining = m_config.stopUpdatePreviewOnTraining;
 	m_autoCheckDB = m_config.autoCheckDB;
+	m_autoCheckUpgrade =m_config.autoCheckUpgrade;
 	m_notifyFavoriteRaceHold = m_config.notifyFavoriteRaceHold;
 	m_theme = static_cast<int>(m_config.theme);
 	DoDataExchange(DDX_LOAD);
@@ -55,6 +56,7 @@ LRESULT ConfigDlg::OnOK(WORD, WORD wID, HWND, BOOL&)
 	m_config.autoStart = m_autoStart;
 	m_config.stopUpdatePreviewOnTraining = m_stopUpdatePreviewOnTraining;
 	m_config.autoCheckDB = m_autoCheckDB;
+	m_config.autoCheckUpgrade = m_autoCheckUpgrade;
 	m_config.notifyFavoriteRaceHold = m_notifyFavoriteRaceHold;
 	m_config.theme = static_cast<Config::Theme>(m_theme);
 

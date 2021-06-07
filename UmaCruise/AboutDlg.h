@@ -10,15 +10,6 @@ class PreviewWindow;
 
 #include "resource.h"
 
-#ifdef _DEBUG
-#define	DEBUG_STRING	L"_Debug"
-#else
-#define	DEBUG_STRING
-#endif
-
-constexpr LPCWSTR	kAppVersion = L"v1.10-sp1" DEBUG_STRING;
-constexpr LPCWSTR	oAppVersion = L"v1.10";
-
 class CAboutDlg : public CDialogImpl<CAboutDlg>, DarkModeUI<CAboutDlg>
 {
 public:
