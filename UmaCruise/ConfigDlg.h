@@ -23,6 +23,7 @@ public:
 		DDX_CHECK(IDC_CHECK_AUTOUPGREADE,m_autoCheckUpgrade)
 		DDX_CHECK(IDC_CHECK_NOTIFY_FAVORITERACEHOLD, m_notifyFavoriteRaceHold)
 		DDX_COMBO_INDEX(IDC_COMBO_THEME, m_theme)
+		DDX_CHECK(IDC_CHECK_WINDOW_TOPMOST, m_windowTopMost)
 	END_DDX_MAP()
 
 	BEGIN_MSG_MAP_EX(ConfigDlg)
@@ -53,5 +54,6 @@ private:
 	bool	m_autoCheckUpgrade = true;
 	bool	m_notifyFavoriteRaceHold = true;
 	int		m_theme = Config::kAuto;
+	bool	m_windowTopMost = false;
 
 };

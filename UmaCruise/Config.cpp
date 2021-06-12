@@ -31,6 +31,8 @@ bool Config::LoadConfig()
 	autoCheckUpgrade = jsonSetting["Config"].value("AutoCheckUpgrade", autoCheckUpgrade);
 	notifyFavoriteRaceHold = jsonSetting["Config"].value("NotifyFavoriteRaceHold", notifyFavoriteRaceHold);
 	theme = jsonSetting["Config"].value("Theme", theme);
+	windowTopMost = jsonSetting["Config"].value("WindowTopMost", windowTopMost);
+	language = jsonSetting["Config"].value("Language", language);
 
     return true;
 }
@@ -51,6 +53,8 @@ void Config::SaveConfig()
 	jsonSetting["Config"]["AutoCheckUpgrade"] = autoCheckUpgrade;	
 	jsonSetting["Config"]["NotifyFavoriteRaceHold"] = notifyFavoriteRaceHold;
 	jsonSetting["Config"]["Theme"] = theme;
+	jsonSetting["Config"]["WindowTopMost"] = windowTopMost;
+	jsonSetting["Config"]["Language"] = language;
 
 	std::ofstream ofs((GetExeDirectory() / "setting.json").wstring());
 	ofs << jsonSetting.dump(4);

@@ -1,0 +1,4 @@
+{
+    "999": "test_str",
+    "-999": "test_str_no_ctl"
+}

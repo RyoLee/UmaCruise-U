@@ -24,8 +24,8 @@ using json = nlohmann::json;
 using namespace CodeConvert;
 using namespace cv;
 
-LPCWSTR kAppVersion = L"v1.10-sp2" DEBUG_STRING;
-LPCWSTR	bAppVersion = L"v1.10";
+LPCWSTR kAppVersion = L"v1.11-rc0" DEBUG_STRING;
+LPCWSTR	bAppVersion = L"v1.11";
 
 bool IsDarkMode()
 {
@@ -79,7 +79,7 @@ bool SaveScreenShot(const std::wstring& device, const std::wstring& filePath)
 
 /////////////////////////////////////////////////////////////////////////////
 
-CMainDlg::CMainDlg() : m_raceListWindow(m_config)
+CMainDlg::CMainDlg() : m_raceListWindow(m_config), m_wndScreenShotButton(this, 1)
 {
 }
 
@@ -124,7 +124,7 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	}
 
 	m_config.LoadConfig();
-	
+	m_i18n.Load(m_config.language);
 	if(m_config.autoCheckUpgrade){
 		_CheckUmaCruiseU();
 	}
@@ -169,7 +169,7 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 		const int IDC_EFFECT = IDC_EDIT_EFFECT1 + i;
 
 		// これを設定しないとフォント表示がおかしくなる
-		GetDlgItem(IDC_EFFECT).SendMessage(EM_SETLANGOPTIONS, 0, (LPARAM)IMF_UIFONTS/*dwLangOptions*/);
+		GetDlgItem(IDC_EFFECT).SendMessage(EM_SETLANGOPTIONS, 0, (LPARAM)IMF_UIFONTS);
 		//GetDlgItem(IDC_EFFECT).SetFont(m_effectFont);
 	}
 
@@ -245,6 +245,9 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 				if (windowRect.is_null() == false) {
 					CRect rc(windowRect[0], windowRect[1], windowRect[2], windowRect[3]);
 					SetWindowPos(NULL, rc.left, rc.top, 0, 0, SWP_NOSIZE | SWP_NOOWNERZORDER);
+				}
+				if (m_config.windowTopMost) {
+					SetWindowPos(HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 				}
 
 				m_bShowRaceList = jsonSetting["MainDlg"].value<bool>("ShowRaceList", m_bShowRaceList);
@@ -409,6 +412,8 @@ void CMainDlg::OnShowConfigDlg(UINT uNotifyCode, int nID, CWindow wndCtl)
 			m_previewWindow.OnThemeChanged();
 			m_popupRichEdit.OnThemeChanged();
 		}
+
+		SetWindowPos(m_config.windowTopMost ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);	
 	}
 }
 
@@ -921,6 +926,14 @@ BOOL CMainDlg::OnSetCursor(CWindow wnd, UINT nHitTest, UINT message)
 	}
 	return 0;
 }
+
+// スクリーンショット 右クリック
+void CMainDlg::OnScreenShotButtonUp(UINT nFlags, CPoint point)
+{
+	const auto ssFolderPath = GetExeDirectory() / L"screenshot";
+	::ShellExecute(NULL, NULL, ssFolderPath.c_str(), NULL, NULL, SW_NORMAL);
+}
+
 void CMainDlg::_InitRaceListWindow(){
 	INFO_LOG << L"initializing racelist windows...";
 
@@ -1034,7 +1047,6 @@ void CMainDlg::_UpdateEventEffect(CRichEditCtrl richEdit, const std::wstring& ef
 		std::wregex rx(LR"(『(.+?)』)");
 		for (std::wsregex_iterator it(effectText.begin(), effectText.end(), rx), end; it != end; ++it) {
 			std::wstring skillName = it->str(1);
-			INFO_LOG << L"Finding:" << skillName;
 			if (setSkillName.find(skillName) != setSkillName.end()) {
 				continue;	// 同じスキル名は追加しない
 			}
@@ -1053,6 +1065,8 @@ void CMainDlg::_UpdateEventEffect(CRichEditCtrl richEdit, const std::wstring& ef
 	// ステータス上昇降下へ色を付ける
 	funcChangeTextColor(richEdit, L"+", m_effectStatusInc);
 	funcChangeTextColor(richEdit, L"-", m_effectStatusDec);
+	funcChangeTextColor(richEdit, L"<WARN>", m_effectStatusDec);
+	
 	
 	richEdit.SetSel(0, 0);
 }
@@ -1093,7 +1107,7 @@ void CMainDlg::_CheckUmaLibrary()
 
 		WinHTTPWrapper::CUrl downloadUrl(libraryURL.c_str());
 		auto hConnect = WinHTTPWrapper::HttpConnect(downloadUrl);
-		auto hRequest = WinHTTPWrapper::HttpOpenRequest(downloadUrl, hConnect, L"GET");
+		auto hRequest = WinHTTPWrapper::HttpOpenRequest(downloadUrl, hConnect, L"HEAD", L"", true);
 		if (WinHTTPWrapper::HttpSendRequestAndReceiveResponse(hRequest)) {
 			int statusCode = WinHTTPWrapper::HttpQueryStatusCode(hRequest);
 			if (statusCode == 200) {
@@ -1106,9 +1120,6 @@ void CMainDlg::_CheckUmaLibrary()
 						if (optDLData) {
 							fs::remove(umaLibraryPath);
 							SaveFile(umaLibraryPath, optDLData.get());
-							if(MessageBox(L"New data will take effect at next time!\nExit now?", L"Success", MB_ICONINFORMATION|MB_YESNO)==IDYES){
-								exit(0);
-							}
 							return;
 						} else {
 							MessageBox(L"Download failed...", L"Error", MB_ICONERROR);
@@ -1139,6 +1150,4 @@ void CMainDlg::_CheckUmaLibrary()
 	ATLASSERT(FALSE);
 	MessageBox(L"An error has occurred...", L"Error", MB_ICONERROR);
 }
-
-
 

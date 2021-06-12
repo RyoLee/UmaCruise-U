@@ -35,6 +35,7 @@ LRESULT ConfigDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	m_autoCheckUpgrade =m_config.autoCheckUpgrade;
 	m_notifyFavoriteRaceHold = m_config.notifyFavoriteRaceHold;
 	m_theme = static_cast<int>(m_config.theme);
+	m_windowTopMost = m_config.windowTopMost;
 	DoDataExchange(DDX_LOAD);
 
 	DarkModeInit();
@@ -59,6 +60,7 @@ LRESULT ConfigDlg::OnOK(WORD, WORD wID, HWND, BOOL&)
 	m_config.autoCheckUpgrade = m_autoCheckUpgrade;
 	m_config.notifyFavoriteRaceHold = m_notifyFavoriteRaceHold;
 	m_config.theme = static_cast<Config::Theme>(m_theme);
+	m_config.windowTopMost = m_windowTopMost;
 
 	m_config.SaveConfig();
 

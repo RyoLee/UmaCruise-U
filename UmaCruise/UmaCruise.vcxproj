@@ -158,7 +158,7 @@ copy "$(SolutionDir)\\AUTHORS.txt" "$(SolutionDir)\\x64\\Debug"
 copy "$(SolutionDir)\\readme.Original.md" "$(SolutionDir)\\x64\\Debug"
 xcopy "$(SolutionDir)\\UmaCruise\\res\\se" "$(SolutionDir)\\x64\\Debug\\se" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\tessdata" "$(SolutionDir)\\x64\\Debug\\tessdata" /E/I
-xcopy "$(SolutionDir)\\UmaLibrary" "$(SolutionDir)\\x64\\Debug\\UmaLibrary" /E/I</Command>
+xcopy "$(SolutionDir)\\UmaCruise\\res\\UmaLibrary" "$(SolutionDir)\\x64\\Debug\\UmaLibrary" /E/I</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>rd /s/q "$(SolutionDir)\\Debug"
@@ -167,7 +167,7 @@ copy "$(SolutionDir)\\AUTHORS.txt" "$(SolutionDir)\\Debug"
 copy "$(SolutionDir)\\readme.Original.md" "$(SolutionDir)\\Debug"
 xcopy "$(SolutionDir)\\UmaCruise\\res\\se" "$(SolutionDir)\\Debug\\se" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\tessdata" "$(SolutionDir)\\Debug\\tessdata" /E/I
-xcopy "$(SolutionDir)\\UmaLibrary" "$(SolutionDir)\\Debug\\UmaLibrary" /E/I
+xcopy "$(SolutionDir)\\UmaCruise\\res\\UmaLibrary" "$(SolutionDir)\\Debug\\UmaLibrary" /E/I
 copy "$(targetPath)" "$(SolutionDir)\\Debug\\UmaCruise.exe"</Command>
     </PostBuildEvent>
     <Manifest />
@@ -237,7 +237,7 @@ copy "$(SolutionDir)\\AUTHORS.txt" "$(SolutionDir)\\x64\\Release"
 copy "$(SolutionDir)\\readme.Original.md" "$(SolutionDir)\\x64\\Release"
 xcopy "$(SolutionDir)\\UmaCruise\\res\\se" "$(SolutionDir)\\x64\\Release\\se" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\tessdata" "$(SolutionDir)\\x64\\Release\\tessdata" /E/I
-xcopy "$(SolutionDir)\\UmaLibrary" "$(SolutionDir)\\x64\\Release\\UmaLibrary" /E/I</Command>
+xcopy "$(SolutionDir)\\UmaCruise\\res\\UmaLibrary" "$(SolutionDir)\\x64\\Release\\UmaLibrary" /E/I</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>rd /s/q "$(SolutionDir)\\Release"
@@ -246,7 +246,7 @@ copy "$(SolutionDir)\\AUTHORS.txt" "$(SolutionDir)\\Release"
 copy "$(SolutionDir)\\readme.Original.md" "$(SolutionDir)\\Release"
 xcopy "$(SolutionDir)\\UmaCruise\\res\\se" "$(SolutionDir)\\Release\\se" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\tessdata" "$(SolutionDir)\\Release\\tessdata" /E/I
-xcopy "$(SolutionDir)\\UmaLibrary" "$(SolutionDir)\\Release\\UmaLibrary" /E/I
+xcopy "$(SolutionDir)\\UmaCruise\\res\\UmaLibrary" "$(SolutionDir)\\Release\\UmaLibrary" /E/I
 copy "$(targetPath)" "$(SolutionDir)\\Release\\UmaCruise.exe"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -254,6 +254,7 @@ copy "$(targetPath)" "$(SolutionDir)\\Release\\UmaCruise.exe"</Command>
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="ConfigDlg.cpp" />
+    <ClCompile Include="I18N.cpp" />
     <ClCompile Include="MainDlg.cpp" />
     <ClCompile Include="PreviewWindow.cpp" />
     <ClCompile Include="RaceDateLibrary.cpp" />
@@ -287,6 +288,7 @@ copy "$(targetPath)" "$(SolutionDir)\\Release\\UmaCruise.exe"</Command>
     <ClInclude Include="Config.h" />
     <ClInclude Include="ConfigDlg.h" />
     <ClInclude Include="DarkModeUI.h" />
+    <ClInclude Include="I18N.h" />
     <ClInclude Include="MainDlg.h" />
     <ClInclude Include="PreviewWindow.h" />
     <ClInclude Include="RaceDateLibrary.h" />

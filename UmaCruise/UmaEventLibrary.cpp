@@ -176,6 +176,8 @@ bool UmaEventLibrary::LoadUmaMusumeLibrary()
 			json jsonCommon;
 			ifs >> jsonCommon;
 			m_kMinThreshold = jsonCommon["Common"]["Simstring"].value<double>("MinThreshold", m_kMinThreshold);
+			m_kUmaMusumeNameMinThreshold = 
+				jsonCommon["Common"]["Simstring"].value<double>("UmaMusumeNameMinThreshold", m_kUmaMusumeNameMinThreshold);			
 		}
 
 		_DBUmaNameInit();
@@ -231,7 +233,7 @@ void UmaEventLibrary::AnbigiousChangeIkuseImaMusume(std::vector<std::wstring> am
 	}
 
 	// Output similar strings from Unicode queries.
-	auto optResult = retrieve(*m_dbUmaNameReader, ambiguousUmaMusumeNames, simstring::cosine, 0.6, m_kMinThreshold);
+	auto optResult = retrieve(*m_dbUmaNameReader, ambiguousUmaMusumeNames, simstring::cosine, 0.6, m_kUmaMusumeNameMinThreshold);
 	if (optResult) {
 		ChangeIkuseiUmaMusume(optResult.get());
 	}
