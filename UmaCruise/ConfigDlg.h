@@ -3,6 +3,7 @@
 #include "Config.h"
 #include "DarkModeUI.h"
 #include "resource.h"
+#include "I18N.h"
 
 
 class ConfigDlg : 
@@ -24,6 +25,7 @@ public:
 		DDX_CHECK(IDC_CHECK_NOTIFY_FAVORITERACEHOLD, m_notifyFavoriteRaceHold)
 		DDX_COMBO_INDEX(IDC_COMBO_THEME, m_theme)
 		DDX_CHECK(IDC_CHECK_WINDOW_TOPMOST, m_windowTopMost)
+		DDX_COMBO_INDEX(IDC_COMBO_LANGUAGE, m_language)
 	END_DDX_MAP()
 
 	BEGIN_MSG_MAP_EX(ConfigDlg)
@@ -48,12 +50,13 @@ private:
 	Config&		m_config;
 
 	CComboBox	m_cmbRefreshInterval;
-	bool	m_autoStart = false;
-	bool	m_stopUpdatePreviewOnTraining = false;
+	bool	m_autoStart = true;
+	bool	m_stopUpdatePreviewOnTraining = true;
 	bool	m_autoCheckDB = true;
 	bool	m_autoCheckUpgrade = true;
 	bool	m_notifyFavoriteRaceHold = true;
 	int		m_theme = Config::kAuto;
 	bool	m_windowTopMost = false;
+	int		m_language = I18N::CODE_639_3166::en_US;
 
 };

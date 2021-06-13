@@ -29,13 +29,22 @@ LRESULT ConfigDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 		cmbTheme.AddString(themeText);
 	}
 
+	CComboBox cmbLanguage = GetDlgItem(IDC_COMBO_LANGUAGE);
+	I18N m_i18n;
+	for (int i = 0; i < I18N::kMAXLanguage; i++) {
+		LPCWSTR text = m_i18n.C_CODE_639_3166[i];
+		cmbLanguage.AddString(text);
+	}
+	cmbLanguage.EnableWindow(false);
+
 	m_autoStart = m_config.autoStart;
 	m_stopUpdatePreviewOnTraining = m_config.stopUpdatePreviewOnTraining;
 	m_autoCheckDB = m_config.autoCheckDB;
-	m_autoCheckUpgrade =m_config.autoCheckUpgrade;
+	m_autoCheckUpgrade = m_config.autoCheckUpgrade;
 	m_notifyFavoriteRaceHold = m_config.notifyFavoriteRaceHold;
 	m_theme = static_cast<int>(m_config.theme);
 	m_windowTopMost = m_config.windowTopMost;
+	m_language = static_cast<int>(m_config.language);
 	DoDataExchange(DDX_LOAD);
 
 	DarkModeInit();
@@ -61,6 +70,7 @@ LRESULT ConfigDlg::OnOK(WORD, WORD wID, HWND, BOOL&)
 	m_config.notifyFavoriteRaceHold = m_notifyFavoriteRaceHold;
 	m_config.theme = static_cast<Config::Theme>(m_theme);
 	m_config.windowTopMost = m_windowTopMost;
+	m_config.language = static_cast<I18N::CODE_639_3166>(m_language);
 
 	m_config.SaveConfig();
 

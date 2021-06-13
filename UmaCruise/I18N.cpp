@@ -3,9 +3,9 @@
 
 bool I18N::Load(CODE_639_3166 language)
 {
-	CString tName = C_CODE_639_3166[language] + ".json";
-	std::ifstream fsd((GetExeDirectory() / L"UmaLibrary" / "en_US.json").wstring());			//default language
-	std::ifstream fst((GetExeDirectory() / L"UmaLibrary" / tName.GetString()).wstring());		//target language
+	std::wstring tName = std::wstring(C_CODE_639_3166[language]) + L".json";
+	std::ifstream fsd((GetExeDirectory() / L"UmaLibrary" / L"en_US.json").wstring());			//default language
+	std::ifstream fst((GetExeDirectory() / L"UmaLibrary" / tName.c_str()).wstring());			//target language
 	ATLASSERT(fsd);
 	fsd >> data;
 	if (!fst) {

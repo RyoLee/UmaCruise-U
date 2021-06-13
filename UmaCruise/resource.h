@@ -9,6 +9,7 @@
 #define IDD_CONFIG                      205
 #define IDD_RACELIST                    207
 #define IDD_I18N_TEST                   999
+
 #define IDC_BUTTON_SCREENSHOT           1000
 #define IDC_EDIT_EVENTNAME              1001
 #define IDC_EDIT_EVENT_SOURCE           1002
@@ -44,11 +45,14 @@
 #define IDC_CHECK_AUTOUPDATE            1050
 #define IDC_CHECK_AUTOUPGREADE          1051
 #define IDC_CHECK_WINDOW_TOPMOST        1052
+#define IDC_COMBO_LANGUAGE              1053
+
 #define IDC_RICHEDIT21                  1150
 #define IDC_RICHEDIT22                  1151
 #define IDC_RICHEDIT23                  1152
 #define IDC_RICHEDIT24                  1153
 #define IDC_RICHEDIT25                  1154
+
 #define IDC_EDIT_OPTION1                1500
 #define IDC_EDIT_OPTION2                1501
 #define IDC_EDIT_OPTION3                1502
@@ -59,6 +63,7 @@
 #define IDC_EDIT_EFFECT3                1512
 #define IDC_EDIT_EFFECT4                1513
 #define IDC_EDIT_EFFECT5                1514
+
 #define IDC_CHECK_G1                    1616
 #define IDC_CHECK_G2                    1617
 #define IDC_CHECK_G3                    1618

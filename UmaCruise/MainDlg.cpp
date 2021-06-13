@@ -1071,7 +1071,9 @@ void CMainDlg::_UpdateEventEffect(CRichEditCtrl richEdit, const std::wstring& ef
 	richEdit.SetSel(0, 0);
 }
 void CMainDlg::_CheckUmaCruiseU(){
+	
 	CString versionURL = L"https://cdn.jsdelivr.net/gh/RyoLee/UmaCruise-U@master/appversion.txt";
+	CString upgradeURL = L"https://cdn.jsdelivr.net/gh/RyoLee/UmaCruise-U@res/UmaCruise-U.7z";
 	if (auto optVersion = WinHTTPWrapper::HttpDownloadData(versionURL)) {
 		std::wstring latestVersion = UTF16fromUTF8(optVersion.get());
 		boost::algorithm::trim_all(latestVersion);
@@ -1079,7 +1081,7 @@ void CMainDlg::_CheckUmaCruiseU(){
 			CString msg;
 			msg.Format(L"A new version of the UmaCruise-U is available!\n\nNew:\t%s\nOld:\t%s\n\nUpdate now?", latestVersion.c_str(), kAppVersion);
 			if (MessageBox(msg, L"Update", MB_ICONINFORMATION|MB_YESNO) == IDYES) {
-				::ShellExecute(NULL, nullptr, L"https://cdn.jsdelivr.net/gh/RyoLee/UmaCruise-U@res/UmaCruise-U.7z", nullptr, nullptr, SW_NORMAL);
+				::ShellExecute(NULL, nullptr, upgradeURL, nullptr, nullptr, SW_NORMAL);
 				exit(0);
 			}
 		}
