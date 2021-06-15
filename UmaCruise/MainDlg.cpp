@@ -129,7 +129,7 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 		_CheckUmaCruiseU();
 	}
 	if(m_config.autoCheckDB){
-		_CheckUmaLibrary();
+		_CheckUmaLibrary(m_config.language);
 	}
 	ChangeGlobalTheme(m_config.theme);
 
@@ -1090,7 +1090,7 @@ void CMainDlg::_CheckUmaCruiseU(){
 		return;
 	}
 }
-void CMainDlg::_CheckUmaLibrary()
+void CMainDlg::_CheckUmaLibrary(I18N::CODE_639_3166 language)
 {
 	try {
 		std::ifstream ifs((GetExeDirectory() / L"UmaLibrary" / "Common.json").wstring());
@@ -1101,7 +1101,15 @@ void CMainDlg::_CheckUmaLibrary()
 		}
 		json jsonCommon;
 		ifs >> jsonCommon;
-		std::string libraryURL = jsonCommon["Common"]["UmaMusumeLibraryURL"];
+		std::string libraryURL;
+		if(I18N::CODE_639_3166::ja_JP != language){
+			std::string ts = jsonCommon["Common"]["LibraryURL"]["default"];
+			libraryURL = ts;
+		}
+		else{
+			std::string ts = jsonCommon["Common"]["LibraryURL"]["ja_JP"];
+			libraryURL = ts;
+		}
 		libraryURL += "?" + std::to_string(std::time(nullptr));	// キャッシュ取得回避
 		// ファイルサイズ取得
 		auto umaLibraryPath = GetExeDirectory() / L"UmaLibrary" / L"UmaMusumeLibrary.json";

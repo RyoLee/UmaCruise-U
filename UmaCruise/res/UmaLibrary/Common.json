@@ -1,7 +1,10 @@
 {
     "Common": {
-        "UmaMusumeLibraryURL":"https://cdn.jsdelivr.net/gh/RyoLee/UmaUmaCruise-db-urarawin@master/UmaMusumeLibrary.json",
-
+        "LibraryURL":
+        {
+            "default": "https://cdn.jsdelivr.net/gh/RyoLee/UmaUmaCruise-db-urarawin@master/UmaMusumeLibrary.json",
+            "ja_JP": "https://cdn.jsdelivr.net/gh/RyoLee/UmaUmaCruise-db-urarawin@master/UmaMusumeLibrary.jp.json"
+        },
         "TargetWindow": {
             "WindowName": "umamusume",
             "ClassName":  "UnityWndClass"

@@ -147,7 +147,7 @@ private:
 	void	_ShowHideExOpts(bool bExtent);
 	void	_UpdateEventOptions(const UmaEventLibrary::UmaEvent& umaEvent);
 	void	_UpdateEventEffect(CRichEditCtrl richEdit, const std::wstring& effectText);
-	void 	_CheckUmaLibrary();
+	void 	_CheckUmaLibrary(I18N::CODE_639_3166 language);
 	void	_CheckUmaCruiseU();
 	Config	m_config;
 	I18N	m_i18n;
