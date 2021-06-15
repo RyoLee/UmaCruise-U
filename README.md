@@ -5,7 +5,7 @@ A  customized version of [UmaUmaCruise](https://github.com/amate/UmaUmaCruise)
 Get more information about UmaCruise-U over [here](https://nga.178.com/read.php?tid=26740403)(Simplified Chinese)
 
 ### Relative projects
-[UmaUmaCruise](https://github.com/amate/UmaUmaCruise) -- Original project
+[UmaUmaCruise](https://github.com/amate/UmaUmaCruise) -- Base project
 
 [Urarawin](https://github.com/wrrwrr111/pretty-derby) -- Data source
 
