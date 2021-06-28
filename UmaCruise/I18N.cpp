@@ -1,5 +1,8 @@
 #include "stdafx.h"
 #include "I18N.h"
+#include <codecvt>
+#include <string>
+
 
 bool I18N::Load(CODE_639_3166 language)
 {
@@ -19,17 +22,58 @@ bool I18N::Load(CODE_639_3166 language)
     return true;
 }
 
-void I18N::Cover(HWND hDlg, int cID)
+void I18N::Cover(HWND hDlg,const CFont& gFont)
 {
-	CString text = GetText(cID);
-	CWindow cw = GetDlgItem(hDlg, cID);
-	cw.SetWindowText(text);
-}
+	std::vector<HWND> childWindowList;
+	EnumChildWindows(hDlg, [](HWND hwnd, LPARAM lParam) -> BOOL {
+		auto pList = (std::vector<HWND>*)lParam;
+		pList->emplace_back(hwnd);
+		return TRUE;
+		}, (LPARAM)&childWindowList);
 
-CString I18N::GetText(int id){
-	CString csId;
-	csId.Format(_T("%d"), id);
-	CString text = data[csId];
+	for (HWND hwnd : childWindowList) {
+		int nID = ::GetDlgCtrlID(hwnd);
+		char ptr[1024];
+		itoa(nID, ptr, 10);
+		CWindow w = ::GetDlgItem(hDlg, nID);
+		if (w.IsWindow()) {
+			w.SetFont(gFont, true);
+			if (data.contains(ptr)) {
+				std::string ts = data[ptr];
+				CString text = ts.c_str();
+				w.SetWindowText(text);
+			}
+		}
+	}
+}
+CString I18N::GetCSText(int id){
+	CString text = GetWSText(id).c_str();
 	ATLASSERT(!(text.IsEmpty()||text.GetLength()==0));
 	return text;
+}
+std::wstring convert(const std::string& input)
+{
+	try
+	{
+		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+		return converter.from_bytes(input);
+	}
+	catch (std::range_error& e)
+	{
+		size_t length = input.length();
+		std::wstring result;
+		result.reserve(length);
+		for (size_t i = 0; i < length; i++)
+		{
+			result.push_back(input[i] & 0xFF);
+		}
+		return result;
+	}
+}
+std::wstring  I18N::GetWSText(int id){
+	char ptr[1024];
+	itoa(id, ptr, 10);
+	ATLASSERT(data.contains(ptr));
+	std::string ts = data[ptr];
+	return convert(ts);
 }

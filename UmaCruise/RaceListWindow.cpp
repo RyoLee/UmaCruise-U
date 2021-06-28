@@ -178,7 +178,12 @@ void RaceListWindow::EntryRaceDistance(int distance)
 	}
 	CString text;
 	std::pair<int, CString> expectURA;
-	LPCWSTR kDisntanceClassNames[4] = { L"短距離", L"マイル", L"中距離", L"長距離" };
+	LPCWSTR kDisntanceClassNames[4] = { 
+		m_config.i18n.GetCSText(IDC_CHECK_SPRINT),
+		m_config.i18n.GetCSText(IDC_CHECK_MILE),
+		m_config.i18n.GetCSText(IDC_CHECK_MIDDLE),
+		m_config.i18n.GetCSText(IDC_CHECK_LONG)
+	};
 	int appendCount = 0;
 	for (int i = 0; i < 4; ++i) {
 		int a = entryRaceClassCount[i];
@@ -271,6 +276,7 @@ DWORD RaceListWindow::OnItemPrePaint(int, LPNMCUSTOMDRAW lpNMCustomDraw)
 
 LRESULT RaceListWindow::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 {
+	m_config.i18n.Cover(m_hWnd, m_config.gFont);
 	// set icons
 	HICON hIcon = AtlLoadIconImage(IDR_MAINFRAME, LR_DEFAULTCOLOR, ::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON));
 	SetIcon(hIcon, TRUE);
@@ -297,12 +303,12 @@ LRESULT RaceListWindow::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 		lvc.iSubItem = nItem;
 		m_raceListView.InsertColumn(nItem, &lvc);
 	};
-	funcAddColumn(L"Date", 0, 170);
-	funcAddColumn(L"Race", 1, 120);
-	funcAddColumn(L"Distance", 2, 130);
-	funcAddColumn(L"Ground", 3, 28);
-	funcAddColumn(L"Direction", 4, 28);
-	funcAddColumn(L"Racetrack", 5, 46);
+	funcAddColumn(m_config.i18n.GetCSText(IDC_STR_DATE), 0, 140);
+	funcAddColumn(m_config.i18n.GetCSText(IDC_STR_RACE), 1, 190);
+	funcAddColumn(m_config.i18n.GetCSText(IDC_STATIC_DIS_GROUP), 2, 95);
+	funcAddColumn(m_config.i18n.GetCSText(IDC_STATIC_GND_GROUP), 3, 30);
+	funcAddColumn(m_config.i18n.GetCSText(IDC_STATIC_DIR_GROUP), 4, 30);
+	funcAddColumn(m_config.i18n.GetCSText(IDC_STATIC_RT_GROUP), 5, 45);
 
 	// 設定読み込み
 	{

@@ -17,6 +17,7 @@ LRESULT ConfigDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 {
 	DoDataExchange(DDX_LOAD);
 
+	m_config.i18n.Cover(m_hWnd, m_config.gFont);
 	enum { kMaxRefershCount = 10 };
 	for (int i = 1; i <= kMaxRefershCount; ++i) {
 		m_cmbRefreshInterval.AddString(std::to_wstring(i).c_str());
@@ -30,13 +31,14 @@ LRESULT ConfigDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	}
 
 	CComboBox cmbLanguage = GetDlgItem(IDC_COMBO_LANGUAGE);
-	I18N m_i18n;
 	for (int i = 0; i < I18N::kMAXLanguage; i++) {
-		LPCWSTR text = m_i18n.C_CODE_639_3166[i];
+		LPCWSTR text = m_config.i18n.C_CODE_639_3166[i];
 		cmbLanguage.AddString(text);
 	}
-	cmbLanguage.EnableWindow(false);
-
+	if (!m_config.screenShotFolder.empty())
+	{
+		SetDlgItemText(IDC_EDIT_SS_FOLDER, m_config.screenShotFolder.c_str());
+	}
 	m_autoStart = m_config.autoStart;
 	m_stopUpdatePreviewOnTraining = m_config.stopUpdatePreviewOnTraining;
 	m_autoCheckDB = m_config.autoCheckDB;
@@ -44,6 +46,7 @@ LRESULT ConfigDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	m_notifyFavoriteRaceHold = m_config.notifyFavoriteRaceHold;
 	m_theme = static_cast<int>(m_config.theme);
 	m_windowTopMost = m_config.windowTopMost;
+	m_screenshotFolder = m_config.screenShotFolder.wstring().c_str();
 	m_language = static_cast<int>(m_config.language);
 	DoDataExchange(DDX_LOAD);
 
@@ -55,7 +58,12 @@ LRESULT ConfigDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 LRESULT ConfigDlg::OnOK(WORD, WORD wID, HWND, BOOL&)
 {
 	DoDataExchange(DDX_SAVE);
-
+	if (m_screenshotFolder.GetLength()) {
+		if (!fs::is_directory((LPCWSTR)m_screenshotFolder)) {
+			MessageBox(m_config.i18n.GetCSText(STR_NO_SS_DIR), L"Error", MB_ICONERROR);
+			return 0;
+		}
+	}
 	const int index = m_cmbRefreshInterval.GetCurSel();
 	if (index == -1) {
 		ATLASSERT(FALSE);
@@ -71,7 +79,7 @@ LRESULT ConfigDlg::OnOK(WORD, WORD wID, HWND, BOOL&)
 	m_config.theme = static_cast<Config::Theme>(m_theme);
 	m_config.windowTopMost = m_windowTopMost;
 	m_config.language = static_cast<I18N::CODE_639_3166>(m_language);
-
+	m_config.screenShotFolder = (LPCWSTR)m_screenshotFolder;
 	m_config.SaveConfig();
 
 	EndDialog(IDOK);
@@ -82,4 +90,15 @@ LRESULT ConfigDlg::OnCancel(WORD, WORD, HWND, BOOL&)
 {
 	EndDialog(IDCANCEL);
 	return 0;
+}
+// スクリーンショットの保存先フォルダを選択する
+void ConfigDlg::OnScreenShotFolderSelect(UINT uNotifyCode, int nID, CWindow wndCtl)
+{
+	DWORD dwOptions = FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_FILEMUSTEXIST;
+	CShellFileOpenDialog dlg(nullptr, dwOptions);
+	auto ret = dlg.DoModal();
+	if (ret == IDOK) {
+		dlg.GetFilePath(m_screenshotFolder);
+		DoDataExchange(DDX_LOAD, IDC_EDIT_SS_FOLDER);
+	}
 }

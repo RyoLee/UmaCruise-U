@@ -150,7 +150,6 @@ private:
 	void 	_CheckUmaLibrary(I18N::CODE_639_3166 language);
 	void	_CheckUmaCruiseU();
 	Config	m_config;
-	I18N	m_i18n;
 	bool	m_bShowRaceList = true;
 	bool	m_bShowExOpts = true;
 
@@ -161,7 +160,6 @@ private:
 	PreviewWindow	m_previewWindow;
 	RaceListWindow	m_raceListWindow;
 
-	CFont gFont;
 	CString	m_targetWindowName;
 	CString m_targetClassName;
 

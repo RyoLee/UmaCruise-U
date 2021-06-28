@@ -94,22 +94,22 @@ bool IsEventNameIcon(cv::Mat srcImage, const CRect& rcIconBounds)
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-CAboutDlg::CAboutDlg(PreviewWindow& previewWindow): m_previewWindow(previewWindow)
+CAboutDlg::CAboutDlg(PreviewWindow& previewWindow, Config& config): m_previewWindow(previewWindow),m_config(config)
 {
 }
 
 LRESULT CAboutDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 {
 	CenterWindow(GetParent());
-
+	m_config.i18n.Cover(m_hWnd, m_config.gFont);
 	CWindow wndStaticAbout = GetDlgItem(IDC_STATIC_ABOUT);
 	CWindow wndStaticExtra = GetDlgItem(IDC_STATIC_EX);
 	CString about;
 	CString extra;
 	wndStaticAbout.GetWindowText(about);
-	about.Replace(L"{version}", bAppVersion);
+	about.Replace(L"{version}", m_config.bAppVersion);
 	wndStaticExtra.GetWindowText(extra);
-	extra.Replace(L"{version}", kAppVersion);
+	extra.Replace(L"{version}", m_config.kAppVersion);
 	wndStaticAbout.SetWindowText(about);
 	wndStaticExtra.SetWindowText(extra);
 
@@ -131,21 +131,19 @@ LRESULT CAboutDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	if (g_versionCheckText.IsEmpty()) {
 		std::thread([this]() {
 			CWindow wndVersionCheck = GetDlgItem(IDC_SYSLINK_VERSIONCHECK);
-
 			CString versionURL = L"https://cdn.jsdelivr.net/gh/RyoLee/UmaCruise-U@master/appversion.txt";
 			if (auto optVersion = WinHTTPWrapper::HttpDownloadData(versionURL)) {
 				std::wstring latestVersion = UTF16fromUTF8(optVersion.get());
 				boost::algorithm::trim_all(latestVersion);
-
-				if (latestVersion != kAppVersion) {
-					g_versionCheckText.Format(L"New version: <a>%s</a>", latestVersion.c_str());
+				if (latestVersion != m_config.kAppVersion) {
+					g_versionCheckText.Format(m_config.i18n.GetCSText(STR_NEW_VERSION), latestVersion.c_str());
 					wndVersionCheck.SetWindowText(g_versionCheckText);
 				} else {
-					g_versionCheckText = L"No update";
+					g_versionCheckText = m_config.i18n.GetCSText(STR_NO_UPDATE);
 					wndVersionCheck.SetWindowText(g_versionCheckText);
 				}				
 			} else {
-				g_versionCheckText = L"Check failed";
+				g_versionCheckText = m_config.i18n.GetCSText(STR_CHECK_FAILED);
 				wndVersionCheck.SetWindowText(g_versionCheckText);
 			}
 		}).detach();
@@ -155,7 +153,6 @@ LRESULT CAboutDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	}
 #endif
 	DarkModeInit();
-
 	return TRUE;
 }
 

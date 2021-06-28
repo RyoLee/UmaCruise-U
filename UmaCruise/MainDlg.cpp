@@ -24,9 +24,6 @@ using json = nlohmann::json;
 using namespace CodeConvert;
 using namespace cv;
 
-LPCWSTR kAppVersion = L"v1.11-rc0" DEBUG_STRING;
-LPCWSTR	bAppVersion = L"v1.11";
-
 bool IsDarkMode()
 {
 	CRegKey regkey;
@@ -42,41 +39,6 @@ bool IsDarkMode()
 	return false;
 }
 
-
-
-// android版
-bool SaveScreenShot(const std::wstring& device, const std::wstring& filePath)
-{
-	auto adbPath = GetExeDirectory() / L"platform-tools" / L"adb.exe";
-	std::wstring targetDevice;
-	if (device.length() > 0) {
-		targetDevice = L" -s " + device;
-	}
-
-	std::wstring deviceSSPath = L"/sdcard/screen.png";
-	//if (g_targetDevice.substr(0, 3) != L"127") {
-	//	deviceSSPath = L"/sdcard/Screenshots/screen.png";
-	//}
-
-	std::wstring commandLine = targetDevice + L" shell screencap -p " + deviceSSPath;
-	DWORD ret = StartProcess(adbPath, commandLine);
-	if (ret != 0) {
-		return false;
-		//throw std::runtime_error("shell screencap failed");
-	}
-
-	std::wstring ssPath = filePath;
-	commandLine = std::wstring(targetDevice + L" pull " + deviceSSPath + L" \"") + ssPath + L"\"";
-	ret = StartProcess(adbPath, commandLine);
-	if (ret != 0) {
-		return false;
-		//throw std::runtime_error("pull /sdcard/screen.png failed");
-	}
-	return true;
-}
-
-
-
 /////////////////////////////////////////////////////////////////////////////
 
 CMainDlg::CMainDlg() : m_raceListWindow(m_config), m_wndScreenShotButton(this, 1)
@@ -91,7 +53,7 @@ BOOL CMainDlg::PreTranslateMessage(MSG* pMsg)
 void CMainDlg::ChangeWindowTitle(const std::wstring& title)
 {
 	CString str = L"UmaCruise-U - ";
-	str.Format(L"UmaCruise-U %s - %s", kAppVersion, title.c_str());
+	str.Format(L"UmaCruise-U %s - %s", m_config.kAppVersion, title.c_str());
 	SetWindowText(str);
 }
 
@@ -120,11 +82,11 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	auto sjis_utf16exeDir = UTF16fromShiftJIS(sjisDir);
 	if (exeDir != sjis_utf16exeDir) {
 		//ERROR_LOG << L"exeDir contain unicode";
-		MessageBox(L"It does not work correctly because the folder name contains unicode.\nPlease move the folder to a shallower level (such as C:\\).", L"Error", MB_ICONERROR);
+		MessageBox(m_config.i18n.GetCSText(STR_ERROR_PATH_CSET),L"Error", MB_ICONERROR);
 	}
 
 	m_config.LoadConfig();
-	m_i18n.Load(m_config.language);
+	m_config.i18n.Load(m_config.language);
 	if(m_config.autoCheckUpgrade){
 		_CheckUmaCruiseU();
 	}
@@ -132,6 +94,7 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 		_CheckUmaLibrary(m_config.language);
 	}
 	ChangeGlobalTheme(m_config.theme);
+	m_config.i18n.Cover(m_hWnd, m_config.gFont);
 
 	DoDataExchange(DDX_LOAD);
 
@@ -144,19 +107,6 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	for (int i = 0; i < std::size(m_brsOptions); ++i) {
 		m_brsOptions[i].CreateSolidBrush(m_optionBkColor[i]);
 	}
-
-	// set fond
-	gFont.CreatePointFont(90,L"Segoe UI");
-	for (size_t i = 0; i < kMaxOptionEffect; ++i) {
-		const int IDC_EFFECT = IDC_EDIT_EFFECT1 + i;
-		const int IDC_OPTION = IDC_EDIT_OPTION1 + i;
-		GetDlgItem(IDC_EFFECT).SetFont(gFont);
-		GetDlgItem(IDC_OPTION).SetFont(gFont);
-	}
-	GetDlgItem(IDC_COMBO_UMAMUSUME).SetFont(gFont);
-	GetDlgItem(IDC_EDIT_EVENT_SOURCE).SetFont(gFont);
-	GetDlgItem(IDC_EDIT_EVENTNAME).SetFont(gFont);
-
 	// デフォルトフォント取得
 	CEdit edit = GetDlgItem(IDC_EDIT_OPTION1);
 	HFONT font = edit.GetFont();
@@ -222,7 +172,7 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 			ATLASSERT(ifs);
 			if (!ifs) {
 				ERROR_LOG << L"Common.json does not exist...";
-				ChangeWindowTitle(L"Common.json does not exist...");
+				ChangeWindowTitle(m_config.i18n.GetWSText(STR_NO_COMMON));
 			} else {
 				json jsonCommon;
 				ifs >> jsonCommon;
@@ -267,7 +217,6 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 			}
 		}
 		_InitRaceListWindow();
-
 		DoDataExchange(DDX_LOAD);
 
 	} catch (std::exception& e)
@@ -276,7 +225,7 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 		ERROR_LOG << L"LoadConfig failed: " << (LPCWSTR)(CA2W(e.what()));
 		ATLASSERT(FALSE);
 	}
-	ChangeWindowTitle(L"init suscess!");
+	ChangeWindowTitle(m_config.i18n.GetWSText(STR_INIT_SUCCESS));
 
 	if (m_config.autoStart) {
 		CButton(GetDlgItem(IDC_CHECK_START)).SetCheck(BST_CHECKED);
@@ -309,7 +258,7 @@ LRESULT CMainDlg::OnDestroy(UINT, WPARAM, LPARAM, BOOL&)
 
 LRESULT CMainDlg::OnAppAbout(WORD, WORD, HWND, BOOL&)
 {
-	CAboutDlg dlg(m_previewWindow);
+	CAboutDlg dlg(m_previewWindow,m_config);
 	dlg.DoModal();
 	return 0;
 }
@@ -571,7 +520,7 @@ void CMainDlg::OnScreenShot(UINT uNotifyCode, int nID, CWindow wndCtl)
 
 		//++count;
 		CString title;
-		title.Format(L"Processing time: %s", UTF16fromUTF8(timer.format()).c_str());
+		title.Format(m_config.i18n.GetCSText(STR_PROC_TIME), UTF16fromUTF8(timer.format()).c_str());
 		ChangeWindowTitle((LPCWSTR)title)
 			;
 	} else {
@@ -579,12 +528,18 @@ void CMainDlg::OnScreenShot(UINT uNotifyCode, int nID, CWindow wndCtl)
 		LPCWSTR windowName = m_targetWindowName.GetLength() ? (LPCWSTR)m_targetWindowName : nullptr;
 		HWND hwndTarget = ::FindWindow(className, windowName);
 		if (!hwndTarget) {
-			ChangeWindowTitle(L"Umamusume's window not found...");
+			ChangeWindowTitle(m_config.i18n.GetWSText(STR_WIN_NOT_FOND));
 			return;
 		}
 		auto ssFolderPath = GetExeDirectory() / L"screenshot";
-		if (!fs::is_directory(ssFolderPath)) {
-			fs::create_directory(ssFolderPath);
+		// オプションで設定されたフォルダ
+		if (!m_config.screenShotFolder.empty() && boost::filesystem::is_directory(m_config.screenShotFolder)) {
+			ssFolderPath = m_config.screenShotFolder;
+		} else {
+			// 既定のフォルダ
+			if (!fs::is_directory(ssFolderPath)) {
+				fs::create_directory(ssFolderPath);
+			}
 		}
 
 		auto ssPath = ssFolderPath / (L"screenshot_" + std::to_wstring(std::time(nullptr)) + L".png");
@@ -594,14 +549,12 @@ void CMainDlg::OnScreenShot(UINT uNotifyCode, int nID, CWindow wndCtl)
 		// 
 		auto image = m_umaTextRecoginzer.ScreenShot();
 		if (!image) {
-			ChangeWindowTitle(L"Screenshot failed...");
+			ChangeWindowTitle(m_config.i18n.GetWSText(STR_SS_FAILED));
 			return;
 		}
 		auto pngEncoder = GetEncoderByMimeType(L"image/png");
 		auto ret = image->Save(ssPath.c_str(), &pngEncoder->Clsid);
 		bool success = ret == Gdiplus::Ok;
-		//bool success = SaveWindowScreenShot(hwndTarget, ssPath.wstring());
-		//bool success = SaveScreenShot(L"", ssPath.wstring());
 		ATLASSERT(success);
 
 		m_previewWindow.UpdateImage(ssPath.wstring());
@@ -617,7 +570,7 @@ void CMainDlg::OnStart(UINT uNotifyCode, int nID, CWindow wndCtl)
 	bool bChecked = btnStart.GetCheck() == BST_CHECKED;
 	if (bChecked) {
 		ATLASSERT(!m_threadAutoDetect.joinable());
-		btnStart.SetWindowText(L"Stop");
+		btnStart.SetWindowText(m_config.i18n.GetCSText(STR_STOP));
 		m_cancelAutoDetect = false;
 		m_threadAutoDetect = std::thread([this]()
 		{
@@ -695,9 +648,9 @@ void CMainDlg::OnStart(UINT uNotifyCode, int nID, CWindow wndCtl)
 
 				} else {
 					if (!ssImage) {
-						ChangeWindowTitle(L"Umamusume's window not found...");
+						ChangeWindowTitle(m_config.i18n.GetWSText(STR_WIN_NOT_FOND));
 					} else {
-						ChangeWindowTitle(L"Failed...");
+						ChangeWindowTitle(m_config.i18n.GetWSText(STR_FAILED));
 					}
 					int sleepCount = 0;
 					enum { kMaxSleepCount = 30 };
@@ -710,7 +663,7 @@ void CMainDlg::OnStart(UINT uNotifyCode, int nID, CWindow wndCtl)
 			// finish
 			if (m_threadAutoDetect.joinable()) {
 				CButton btnStart = GetDlgItem(IDC_CHECK_START);
-				btnStart.SetWindowText(L"Start");
+				btnStart.SetWindowText(m_config.i18n.GetCSText(IDC_CHECK_START));
 				btnStart.EnableWindow(TRUE);
 				m_threadAutoDetect.detach();
 			}
@@ -719,7 +672,7 @@ void CMainDlg::OnStart(UINT uNotifyCode, int nID, CWindow wndCtl)
 		//SetTimer(kAutoOCRTimerID, kAutoOCRTimerInterval);
 	} else {
 		if (m_threadAutoDetect.joinable()) {
-			btnStart.SetWindowText(L"Stopping...");
+			btnStart.SetWindowText(m_config.i18n.GetCSText(STR_STOPPING));
 			btnStart.EnableWindow(FALSE);
 			m_cancelAutoDetect = true;
 		}
@@ -753,11 +706,11 @@ void CMainDlg::OnEventRevision(UINT uNotifyCode, int nID, CWindow wndCtl)
 	DoDataExchange(DDX_SAVE, IDC_EDIT_EVENTNAME);
 	DoDataExchange(DDX_SAVE, IDC_EDIT_EVENT_SOURCE);
 	if (m_eventName.IsEmpty()) {
-		MessageBox(L"Event is empty.");
+		MessageBox(m_config.i18n.GetCSText(STR_NO_EVENT));
 		return;
 	}
 	if (m_eventSource.IsEmpty()) {
-		MessageBox(L"Source is empty.");
+		MessageBox(m_config.i18n.GetCSText(STR_NO_SOURCE));
 		return;
 	}
 	
@@ -783,13 +736,13 @@ void CMainDlg::OnEventRevision(UINT uNotifyCode, int nID, CWindow wndCtl)
 		jsonOptionsArray.push_back(jsonOption);
 	}
 	if (jsonOptionsArray.empty()) {
-		MessageBox(L"Options are empty.");
+		MessageBox(m_config.i18n.GetCSText(STR_NO_OPTION));
 		return;
 	}
 
 	CString msg;
-	msg.Format(L"Correct options for event [%s].\nAre you sure?", (LPCWSTR)m_eventName);
-	if (MessageBox(msg, L"Yes", MB_YESNO) == IDNO) {
+	msg.Format(m_config.i18n.GetCSText(STR_CORRECT_CHECK), (LPCWSTR)m_eventName);
+	if (MessageBox(msg, L"Check", MB_YESNO) == IDNO) {
 		return;
 	}
 	{
@@ -830,14 +783,14 @@ void CMainDlg::OnEventRevision(UINT uNotifyCode, int nID, CWindow wndCtl)
 		std::ofstream ofs((GetExeDirectory() / L"UmaLibrary" / "UmaMusumeLibraryRevision.json").wstring());
 		ATLASSERT(ofs);
 		if (!ofs) {
-			MessageBox(L"Open failed:UmaMusumeLibraryRevision.json");
+			MessageBox(m_config.i18n.GetCSText(STR_ERROR_OPEN_REV));
 			return;
 		}
 		ofs << jsonRevisionLibrary.dump(2);
 		ofs.close();
 
 		m_umaEventLibrary.LoadUmaMusumeLibrary();
-		MessageBox(L"Corrected", L"Success");
+		MessageBox(m_config.i18n.GetCSText(STR_SUCCESS));
 	}
 }
 
@@ -930,7 +883,10 @@ BOOL CMainDlg::OnSetCursor(CWindow wnd, UINT nHitTest, UINT message)
 // スクリーンショット 右クリック
 void CMainDlg::OnScreenShotButtonUp(UINT nFlags, CPoint point)
 {
-	const auto ssFolderPath = GetExeDirectory() / L"screenshot";
+	auto ssFolderPath = GetExeDirectory() / L"screenshot";
+	if (fs::is_directory(m_config.screenShotFolder)) {
+		ssFolderPath = m_config.screenShotFolder;
+	}
 	::ShellExecute(NULL, NULL, ssFolderPath.c_str(), NULL, NULL, SW_NORMAL);
 }
 
@@ -1039,7 +995,7 @@ void CMainDlg::_UpdateEventEffect(CRichEditCtrl richEdit, const std::wstring& ef
 	};
 
 	// 獲得スキルの詳細を追記する
-	constexpr LPCWSTR kSkillDetailHeader = L"=====Skill effect=====";
+	CString kSkillDetailHeader = m_config.i18n.GetCSText(STR_SKILL_EFFECT);
 	constexpr LPCWSTR kSkillSeparetor = L"····················";
 	if (effectText.find(kSkillDetailHeader) == std::wstring::npos) {
 		std::unordered_set<std::wstring> setSkillName;
@@ -1077,16 +1033,16 @@ void CMainDlg::_CheckUmaCruiseU(){
 	if (auto optVersion = WinHTTPWrapper::HttpDownloadData(versionURL)) {
 		std::wstring latestVersion = UTF16fromUTF8(optVersion.get());
 		boost::algorithm::trim_all(latestVersion);
-		if (latestVersion != kAppVersion) {
+		if (latestVersion !=  m_config.kAppVersion) {
 			CString msg;
-			msg.Format(L"A new version of the UmaCruise-U is available!\n\nNew:\t%s\nOld:\t%s\n\nUpdate now?", latestVersion.c_str(), kAppVersion);
+			msg.Format(m_config.i18n.GetCSText(STR_NEW_UCU), latestVersion.c_str(),  m_config.kAppVersion);
 			if (MessageBox(msg, L"Update", MB_ICONINFORMATION|MB_YESNO) == IDYES) {
 				::ShellExecute(NULL, nullptr, upgradeURL, nullptr, nullptr, SW_NORMAL);
 				exit(0);
 			}
 		}
 	} else {
-		MessageBox(L"Download failed...", L"Error", MB_ICONERROR);
+		MessageBox(m_config.i18n.GetCSText(STR_DOWNLOAD_FAILED), L"Error", MB_ICONERROR);
 		return;
 	}
 }
@@ -1096,7 +1052,7 @@ void CMainDlg::_CheckUmaLibrary(I18N::CODE_639_3166 language)
 		std::ifstream ifs((GetExeDirectory() / L"UmaLibrary" / "Common.json").wstring());
 		ATLASSERT(ifs);
 		if (!ifs) {
-			MessageBox(L"Load failed:Common.json");
+			MessageBox(m_config.i18n.GetCSText(STR_ERROR_COMMON_LOAD_FAILED));
 			return;
 		}
 		json jsonCommon;
@@ -1124,7 +1080,7 @@ void CMainDlg::_CheckUmaLibrary(I18N::CODE_639_3166 language)
 				DWORD contentLength = 0;
 				HttpQueryHeaders(hRequest, WINHTTP_QUERY_CONTENT_LENGTH, contentLength);
 				if (umaLibraryFileSize != contentLength) {	// ファイルサイズ比較
-					if(MessageBox(L"A new version of the data file is available!\nUpdate now?", L"Update", MB_ICONINFORMATION|MB_YESNO)==IDYES)
+					if(MessageBox(m_config.i18n.GetCSText(STR_NEW_LIB), L"Update", MB_ICONINFORMATION|MB_YESNO)==IDYES)
 					{
 						auto optDLData = WinHTTPWrapper::HttpDownloadData(downloadUrl.GetURL());
 						if (optDLData) {
@@ -1132,7 +1088,7 @@ void CMainDlg::_CheckUmaLibrary(I18N::CODE_639_3166 language)
 							SaveFile(umaLibraryPath, optDLData.get());
 							return;
 						} else {
-							MessageBox(L"Download failed...", L"Error", MB_ICONERROR);
+							MessageBox(m_config.i18n.GetCSText(STR_DOWNLOAD_FAILED), L"Error", MB_ICONERROR);
 							return;
 						}
 					}
@@ -1144,12 +1100,12 @@ void CMainDlg::_CheckUmaLibrary(I18N::CODE_639_3166 language)
 				}
 			} else {
 				CString errorText;
-				errorText.Format(L"The server returned an error.\nStatus code: %d", statusCode);
+				errorText.Format(m_config.i18n.GetCSText(STR_ERROR_HTTP_CODE), statusCode);
 				MessageBox(errorText, L"Error", MB_ICONERROR);
 				return;
 			}
 		} else {
-			MessageBox(L"Failed to send the request.\nSee details on info.log.", L"Error", MB_ICONERROR);
+			MessageBox(m_config.i18n.GetCSText(STR_FAILED), L"Error", MB_ICONERROR);
 			return;
 		}
 	} catch (boost::exception& e) {
@@ -1158,6 +1114,6 @@ void CMainDlg::_CheckUmaLibrary(I18N::CODE_639_3166 language)
 		int a = 0;
 	}
 	ATLASSERT(FALSE);
-	MessageBox(L"An error has occurred...", L"Error", MB_ICONERROR);
+	MessageBox(m_config.i18n.GetCSText(STR_ERROR), L"Error", MB_ICONERROR);
 }
 

@@ -36,6 +36,7 @@ extern CAppModule _Module;
 #include <wtl\atlcrack.h>
 #include <wtl\atlddx.h>
 #include <wtl\atlmisc.h>
+#include <wtl\atldlgs.h>
 
 #include <algorithm>
 #include <vector>

@@ -13,6 +13,9 @@ using namespace CodeConvert;
 
 bool Config::LoadConfig()
 {
+	if(gFont.IsNull()){
+		gFont.CreatePointFont(90,L"Segoe UI");
+	}
 	std::ifstream fs((GetExeDirectory() / "setting.json").wstring());
 	if (!fs) {
 		return true;
@@ -33,7 +36,8 @@ bool Config::LoadConfig()
 	theme = jsonSetting["Config"].value("Theme", theme);
 	windowTopMost = jsonSetting["Config"].value("WindowTopMost", windowTopMost);
 	language = jsonSetting["Config"].value("Language", language);
-
+	screenShotFolder = UTF16fromUTF8(jsonSetting["Config"].value("ScreenShotFolder", ""));
+	i18n.Load(language);
     return true;
 }
 
@@ -54,6 +58,7 @@ void Config::SaveConfig()
 	jsonSetting["Config"]["NotifyFavoriteRaceHold"] = notifyFavoriteRaceHold;
 	jsonSetting["Config"]["Theme"] = theme;
 	jsonSetting["Config"]["WindowTopMost"] = windowTopMost;
+	jsonSetting["Config"]["ScreenShotFolder"] = UTF8fromUTF16(screenShotFolder.wstring());
 	jsonSetting["Config"]["Language"] = language;
 
 	std::ofstream ofs((GetExeDirectory() / "setting.json").wstring());

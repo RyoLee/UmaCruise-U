@@ -27,7 +27,7 @@ public:
 		kFavoriteRaceListVersion = 1,
 	};
 
-	RaceListWindow(const Config& config) : m_config(config) {}
+	RaceListWindow(Config& config) : m_config(config) {}
 
 	void	ShowWindow(bool bShow);
 
@@ -119,7 +119,7 @@ private:
 		kFavorite = 1 << 1,
 	};
 
-	const Config&	m_config;
+	Config&	m_config;
 	RaceDateLibrary	m_raceDateLibrary;
 
 	CString	m_currentTurn;
