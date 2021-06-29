@@ -3,6 +3,25 @@
 #include <codecvt>
 #include <string>
 
+std::wstring convert(const std::string& input)
+{
+	try
+	{
+		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+		return converter.from_bytes(input);
+	}
+	catch (std::range_error& e)
+	{
+		size_t length = input.length();
+		std::wstring result;
+		result.reserve(length);
+		for (size_t i = 0; i < length; i++)
+		{
+			result.push_back(input[i] & 0xFF);
+		}
+		return result;
+	}
+}
 
 bool I18N::Load(CODE_639_3166 language)
 {
@@ -40,7 +59,7 @@ void I18N::Cover(HWND hDlg,const CFont& gFont)
 			w.SetFont(gFont, true);
 			if (data.contains(ptr)) {
 				std::string ts = data[ptr];
-				CString text = ts.c_str();
+				CString text = convert(ts).c_str();
 				w.SetWindowText(text);
 			}
 		}
@@ -50,25 +69,6 @@ CString I18N::GetCSText(int id){
 	CString text = GetWSText(id).c_str();
 	ATLASSERT(!(text.IsEmpty()||text.GetLength()==0));
 	return text;
-}
-std::wstring convert(const std::string& input)
-{
-	try
-	{
-		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-		return converter.from_bytes(input);
-	}
-	catch (std::range_error& e)
-	{
-		size_t length = input.length();
-		std::wstring result;
-		result.reserve(length);
-		for (size_t i = 0; i < length; i++)
-		{
-			result.push_back(input[i] & 0xFF);
-		}
-		return result;
-	}
 }
 std::wstring  I18N::GetWSText(int id){
 	char ptr[1024];
