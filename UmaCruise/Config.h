@@ -27,7 +27,7 @@ struct Config
 	void	SaveConfig();
 	I18N	i18n;
 	CFont	gFont;
-	LPCWSTR kAppVersion = L"v1.12-rc1" DEBUG_STRING;
+	LPCWSTR kAppVersion = L"v1.12-sp1" DEBUG_STRING;
 	LPCWSTR	bAppVersion = L"v1.12";
 };
 
