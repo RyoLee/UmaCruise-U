@@ -35,10 +35,6 @@ LRESULT ConfigDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 		LPCWSTR text = m_config.i18n.C_CODE_639_3166[i];
 		cmbLanguage.AddString(text);
 	}
-	if (!m_config.screenShotFolder.empty())
-	{
-		SetDlgItemText(IDC_EDIT_SS_FOLDER, m_config.screenShotFolder.c_str());
-	}
 	m_autoStart = m_config.autoStart;
 	m_stopUpdatePreviewOnTraining = m_config.stopUpdatePreviewOnTraining;
 	m_autoCheckDB = m_config.autoCheckDB;
