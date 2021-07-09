@@ -304,7 +304,7 @@ LRESULT RaceListWindow::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 		m_raceListView.InsertColumn(nItem, &lvc);
 	};
 	funcAddColumn(m_config.i18n.GetCSText(IDC_STR_DATE), 0, 140);
-	funcAddColumn(m_config.i18n.GetCSText(IDC_STR_RACE), 1, 190);
+	funcAddColumn(m_config.i18n.GetCSText(IDC_STR_RACE), 1, 180);
 	funcAddColumn(m_config.i18n.GetCSText(IDC_STATIC_DIS_GROUP), 2, 95);
 	funcAddColumn(m_config.i18n.GetCSText(IDC_STATIC_GND_GROUP), 3, 30);
 	funcAddColumn(m_config.i18n.GetCSText(IDC_STATIC_DIR_GROUP), 4, 30);

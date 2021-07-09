@@ -157,26 +157,26 @@ CAPTION "Setting"
 FONT 9, "Segoe UI", 0, 0, 0x0
 BEGIN
     CONTROL         "Automatically starts scanning at startup",IDC_CHECK_AUTOSTART,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,8,200,12
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,8,276,12
     CONTROL         "Automatically check for upgrade at startup",IDC_CHECK_AUTOUPGREADE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,30,200,12
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,30,276,12
     CONTROL         "Automatically check for data updates at startup",IDC_CHECK_AUTOUPDATE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,52,200,12
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,52,276,12
     CONTROL         "Stop refreshing the preview window",IDC_CHECK_STOPUPDATEPREVIEWONTRAINING,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,74,200,12
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,74,276,12
     CONTROL         "Notification on the date of the reserved race",IDC_CHECK_NOTIFY_FAVORITERACEHOLD,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,96,200,12
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,96,276,12
     LTEXT           "Interval:",IDC_STATIC_INERTVAL_TEXT,12,118,40,12
     COMBOBOX        IDC_COMBO_REFRESHINTERVAL,60,116,40,84,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Sec",IDC_STATIC_SEC_TEXT,106,118,40,12
+    LTEXT           "Sec",IDC_STATIC_SEC_TEXT,106,118,12,12
     LTEXT           "Theme:",IDC_STATIC_THEME_TEXT,12,140,40,12
     COMBOBOX        IDC_COMBO_THEME,60,138,40,54,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Window always on top",IDC_CHECK_WINDOW_TOPMOST,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,162,108,12
     LTEXT           "Language:",IDC_STATIC_LANGUAGE_TEXT,12,184,40,12
     COMBOBOX        IDC_COMBO_LANGUAGE,60,182,40,54,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     
-    LTEXT           "Screenshot folder：",IDC_STATIC_SS_TEXT,12,206,78,12
-    EDITTEXT        IDC_EDIT_SS_FOLDER,106,204,152,12,ES_AUTOHSCROLL
+    LTEXT           "Screenshot folder：",IDC_STATIC_SS_TEXT,12,206,106,12
+    EDITTEXT        IDC_EDIT_SS_FOLDER,118,204,140,12,ES_AUTOHSCROLL
     PUSHBUTTON      "Find",IDC_BUTTON_SS_SELECT,268,204,20,12
 
     DEFPUSHBUTTON   "OK",IDOK,188,280,50,14
