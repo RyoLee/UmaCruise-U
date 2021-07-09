@@ -163,12 +163,13 @@ xcopy "$(SolutionDir)\\UmaCruise\\res\\UmaLibrary" "$(SolutionDir)\\x64\\Debug\\
     <PostBuildEvent>
       <Command>rd /s/q "$(SolutionDir)\\Debug"
 mkdir "$(SolutionDir)\\Debug"
-copy "$(SolutionDir)\\AUTHORS.txt" "$(SolutionDir)\\Debug"
-copy "$(SolutionDir)\\readme.Original.md" "$(SolutionDir)\\Debug"
-xcopy "$(SolutionDir)\\UmaCruise\\res\\se" "$(SolutionDir)\\Debug\\se" /E/I
-xcopy "$(SolutionDir)\\UmaCruise\\res\\tessdata" "$(SolutionDir)\\Debug\\tessdata" /E/I
-xcopy "$(SolutionDir)\\UmaCruise\\res\\UmaLibrary" "$(SolutionDir)\\Debug\\UmaLibrary" /E/I
-copy "$(targetPath)" "$(SolutionDir)\\Debug\\UmaCruise.exe"</Command>
+mkdir "$(SolutionDir)\\Debug\\UmaCruise-U"
+copy "$(SolutionDir)\\AUTHORS.txt" "$(SolutionDir)\\Debug\\UmaCruise-U"
+copy "$(SolutionDir)\\readme.Original.md" "$(SolutionDir)\\Debug\\UmaCruise-U"
+xcopy "$(SolutionDir)\\UmaCruise\\res\\se" "$(SolutionDir)\\Debug\\UmaCruise-U\\se" /E/I
+xcopy "$(SolutionDir)\\UmaCruise\\res\\tessdata" "$(SolutionDir)\\Debug\\UmaCruise-U\\tessdata" /E/I
+xcopy "$(SolutionDir)\\UmaCruise\\res\\UmaLibrary" "$(SolutionDir)\\Debug\\UmaCruise-U\\UmaLibrary" /E/I
+copy "$(targetPath)" "$(SolutionDir)\\Debug\\UmaCruise-U\\UmaCruise.exe"</Command>
     </PostBuildEvent>
     <Manifest />
     <Manifest />
@@ -242,12 +243,13 @@ xcopy "$(SolutionDir)\\UmaCruise\\res\\UmaLibrary" "$(SolutionDir)\\x64\\Release
     <PostBuildEvent>
       <Command>rd /s/q "$(SolutionDir)\\Release"
 mkdir "$(SolutionDir)\\Release"
-copy "$(SolutionDir)\\AUTHORS.txt" "$(SolutionDir)\\Release"
-copy "$(SolutionDir)\\readme.Original.md" "$(SolutionDir)\\Release"
-xcopy "$(SolutionDir)\\UmaCruise\\res\\se" "$(SolutionDir)\\Release\\se" /E/I
-xcopy "$(SolutionDir)\\UmaCruise\\res\\tessdata" "$(SolutionDir)\\Release\\tessdata" /E/I
-xcopy "$(SolutionDir)\\UmaCruise\\res\\UmaLibrary" "$(SolutionDir)\\Release\\UmaLibrary" /E/I
-copy "$(targetPath)" "$(SolutionDir)\\Release\\UmaCruise.exe"</Command>
+mkdir "$(SolutionDir)\\Release\\UmaCruise-U"
+copy "$(SolutionDir)\\AUTHORS.txt" "$(SolutionDir)\\Release\\UmaCruise-U"
+copy "$(SolutionDir)\\readme.Original.md" "$(SolutionDir)\\Release\\UmaCruise-U"
+xcopy "$(SolutionDir)\\UmaCruise\\res\\se" "$(SolutionDir)\\Release\\UmaCruise-U\\se" /E/I
+xcopy "$(SolutionDir)\\UmaCruise\\res\\tessdata" "$(SolutionDir)\\Release\\UmaCruise-U\\tessdata" /E/I
+xcopy "$(SolutionDir)\\UmaCruise\\res\\UmaLibrary" "$(SolutionDir)\\Release\\UmaCruise-U\\UmaLibrary" /E/I
+copy "$(targetPath)" "$(SolutionDir)\\Release\\UmaCruise-U\\UmaCruise.exe"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
