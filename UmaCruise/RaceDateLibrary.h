@@ -67,7 +67,7 @@ public:
 		bool	IsMatchState(int32_t state);
 	};
 
-	// RaceDataLibrary を読み込む
+	// RaceDataLibrary.json を読み込む
 	bool	LoadRaceDataLibrary();
 
 	// 全ターンリスト

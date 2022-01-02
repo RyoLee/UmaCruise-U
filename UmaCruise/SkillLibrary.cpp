@@ -33,7 +33,7 @@ bool SkillLibrary::LoadSkillLibrary()
 		return true;
 	}
 	catch (std::exception& e) {
-		ERROR_LOG << L"Load SkillLibrary failed: " << UTF16fromUTF8(e.what());
+		ERROR_LOG << L"LoadSkillLibrary failed: " << UTF16fromUTF8(e.what());
 		ATLASSERT(FALSE);
 		return false;
 	}

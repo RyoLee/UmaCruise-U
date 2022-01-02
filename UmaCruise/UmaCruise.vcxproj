@@ -27,26 +27,27 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -131,6 +132,8 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_WINDOWS;STRICT;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>false</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -152,20 +155,28 @@
       <DllDataFileName />
     </Midl>
     <PreBuildEvent>
-      <Command>rd /s/q "$(SolutionDir)\\x64\\Debug"
+      <Command>rd /s/q "$(SolutionDir)\\tmp
+mkdir "$(SolutionDir)\\tmp"
+copy "$(OutDir)\\WindowsGraphicsCapture.dll" "$(SolutionDir)\\tmp"
+rd /s/q "$(SolutionDir)\\x64\\Debug"
 mkdir "$(SolutionDir)\\x64\\Debug"
 copy "$(SolutionDir)\\AUTHORS.txt" "$(SolutionDir)\\x64\\Debug"
 copy "$(SolutionDir)\\readme.Original.md" "$(SolutionDir)\\x64\\Debug"
+copy "$(SolutionDir)\\tmp\\WindowsGraphicsCapture.dll" "$(SolutionDir)\\x64\\Debug"
 xcopy "$(SolutionDir)\\UmaCruise\\res\\se" "$(SolutionDir)\\x64\\Debug\\se" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\tessdata" "$(SolutionDir)\\x64\\Debug\\tessdata" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\UmaLibrary" "$(SolutionDir)\\x64\\Debug\\UmaLibrary" /E/I</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>rd /s/q "$(SolutionDir)\\Debug"
+      <Command>rd /s/q "$(SolutionDir)\\tmp
+mkdir "$(SolutionDir)\\tmp"
+copy "$(OutDir)\\WindowsGraphicsCapture.dll" "$(SolutionDir)\\tmp"
+rd /s/q "$(SolutionDir)\\Debug"
 mkdir "$(SolutionDir)\\Debug"
 mkdir "$(SolutionDir)\\Debug\\UmaCruise-U"
 copy "$(SolutionDir)\\AUTHORS.txt" "$(SolutionDir)\\Debug\\UmaCruise-U"
 copy "$(SolutionDir)\\readme.Original.md" "$(SolutionDir)\\Debug\\UmaCruise-U"
+copy "$(SolutionDir)\\tmp\\WindowsGraphicsCapture.dll" "$(SolutionDir)\\Debug\\UmaCruise-U"
 xcopy "$(SolutionDir)\\UmaCruise\\res\\se" "$(SolutionDir)\\Debug\\UmaCruise-U\\se" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\tessdata" "$(SolutionDir)\\Debug\\UmaCruise-U\\tessdata" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\UmaLibrary" "$(SolutionDir)\\Debug\\UmaCruise-U\\UmaLibrary" /E/I
@@ -212,6 +223,8 @@ copy "$(targetPath)" "$(SolutionDir)\\Debug\\UmaCruise-U\\UmaCruise.exe"</Comman
       <DebugInformationFormat />
       <PreprocessorDefinitions>_WINDOWS;STRICT;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>false</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -232,20 +245,28 @@ copy "$(targetPath)" "$(SolutionDir)\\Debug\\UmaCruise-U\\UmaCruise.exe"</Comman
       <DllDataFileName />
     </Midl>
     <PreBuildEvent>
-      <Command>rd /s/q "$(SolutionDir)\\x64\\Release"
+      <Command>rd /s/q "$(SolutionDir)\\tmp
+mkdir "$(SolutionDir)\\tmp"
+copy "$(OutDir)\\WindowsGraphicsCapture.dll" "$(SolutionDir)\\tmp"
+rd /s/q "$(SolutionDir)\\x64\\Release"
 mkdir "$(SolutionDir)\\x64\\Release"
 copy "$(SolutionDir)\\AUTHORS.txt" "$(SolutionDir)\\x64\\Release"
 copy "$(SolutionDir)\\readme.Original.md" "$(SolutionDir)\\x64\\Release"
+copy "$(SolutionDir)\\tmp\\WindowsGraphicsCapture.dll" "$(SolutionDir)\\x64\\Release"
 xcopy "$(SolutionDir)\\UmaCruise\\res\\se" "$(SolutionDir)\\x64\\Release\\se" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\tessdata" "$(SolutionDir)\\x64\\Release\\tessdata" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\UmaLibrary" "$(SolutionDir)\\x64\\Release\\UmaLibrary" /E/I</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>rd /s/q "$(SolutionDir)\\Release"
+      <Command>rd /s/q "$(SolutionDir)\\tmp
+mkdir "$(SolutionDir)\\tmp"
+copy "$(OutDir)\\WindowsGraphicsCapture.dll" "$(SolutionDir)\\tmp"
+rd /s/q "$(SolutionDir)\\Release"
 mkdir "$(SolutionDir)\\Release"
 mkdir "$(SolutionDir)\\Release\\UmaCruise-U"
 copy "$(SolutionDir)\\AUTHORS.txt" "$(SolutionDir)\\Release\\UmaCruise-U"
 copy "$(SolutionDir)\\readme.Original.md" "$(SolutionDir)\\Release\\UmaCruise-U"
+copy "$(SolutionDir)\\tmp\\WindowsGraphicsCapture.dll" "$(SolutionDir)\\Release\\UmaCruise-U"
 xcopy "$(SolutionDir)\\UmaCruise\\res\\se" "$(SolutionDir)\\Release\\UmaCruise-U\\se" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\tessdata" "$(SolutionDir)\\Release\\UmaCruise-U\\tessdata" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\UmaLibrary" "$(SolutionDir)\\Release\\UmaCruise-U\\UmaLibrary" /E/I
@@ -275,7 +296,10 @@ copy "$(targetPath)" "$(SolutionDir)\\Release\\UmaCruise-U\\UmaCruise.exe"</Comm
     <ClCompile Include="UmaTextRecognizer.cpp" />
     <ClCompile Include="Utility\CodeConvert.cpp" />
     <ClCompile Include="Utility\CommonUtility.cpp" />
-    <ClCompile Include="Utility\GdiplusUtil.cpp" />
+    <ClCompile Include="Utility\GdiplusUtil.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Utility\Logger.cpp" />
     <ClCompile Include="Utility\WinHTTPWrapper.cpp" />
     <ClCompile Include="win32-darkmode\DarkMode.cpp">
@@ -291,6 +315,9 @@ copy "$(targetPath)" "$(SolutionDir)\\Release\\UmaCruise-U\\UmaCruise.exe"</Comm
     <ClInclude Include="ConfigDlg.h" />
     <ClInclude Include="DarkModeUI.h" />
     <ClInclude Include="I18N.h" />
+    <ClInclude Include="DesktopDuplication.h" />
+    <ClInclude Include="GDIWindowCapture.h" />
+    <ClInclude Include="IScreenShotWindow.h" />
     <ClInclude Include="MainDlg.h" />
     <ClInclude Include="PreviewWindow.h" />
     <ClInclude Include="RaceDateLibrary.h" />
@@ -322,6 +349,7 @@ copy "$(targetPath)" "$(SolutionDir)\\Release\\UmaCruise-U\\UmaCruise.exe"</Comm
     <ClInclude Include="win32-darkmode\IatHook.h" />
     <ClInclude Include="win32-darkmode\ListViewUtil.h" />
     <ClInclude Include="win32-darkmode\win32-darkmode.h" />
+    <ClInclude Include="WindowsGraphicsCaptureWrapper.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UmaCruise.rc" />

@@ -30,6 +30,16 @@ UmaUmaCruise.exeが置かれるフォルダまでのパスにunicodeが含まれ
 
 ![](https://raw.githubusercontent.com/amate/UmaUmaCruise/images/images/ss_ikusei_select_macikane.png)
 
+スタートを押したときに[ウマ娘詳細]が表示されていれば、自動的に育成ウマ娘が選択されます
+
+![](https://raw.githubusercontent.com/amate/UmaUmaCruise/images/images/ss3.png)
+
+### ・UmaMusumeLibrary.jsonについて
+
+UmaLibraryフォルダ内の"UmaMusumeLibrary.json"には、イベント名と選択肢の名前/効果が記録されています  
+キャラやサポートの追加によって選択肢が表示されない時には、[設定]->[UmaMusumeLibrary.jsonの更新確認]を実行してみてください
+
+
 ### ・URA予想機能について
 
 >短距離: 1/4
@@ -129,9 +139,12 @@ Visual Studio 2019で "UmaCruise.sln"を開き、
 実行ファイルのプロパティから 互換性->高DPI設定の変更  
 高いDPIスケールの動作を上書きにチェック、アプリケーションを選択してください
 
+- 画面取り込みに"Windows Graphics Capture"を設定した場合、ウマ娘のウィンドウに黄色く枠が現れる  
+仕様です
+
 ## ■イベント選択肢データ(UmaMusumeLibrary.json)について
 
-‎Gamerch様運営の"ウマ娘攻略wiki"からイベントデータを加工して、自動生成しています  
+Gamerch様運営の"ウマ娘攻略wiki"からイベントデータを加工して、自動生成しています  
 URL:https://gamerch.com/umamusume/
 
 ## ■著作権表示
@@ -145,6 +158,179 @@ https://www.kiigo.jp/disp/CSfGoodsPage_001.jsp?GOODS_NO=9
 ## ■更新履歴
 
 <pre>
+
+・[update]UmaMusumeLibrary.json更新 2021-12-23
+- キャラ
+【初晴・青き絢爛】テイエムオペラオー
+【初うらら♪さくさくら】ハルウララ
+- サポート
+［袖振り合えば福となる♪］マチカネフクキタル
+［夜に暁、空に瑞星］アドマイヤベガ
+［飛びも出でぬべき心地すれ］メイショウドトウ
+============================================
+
+v1.18
+・[fix] windows7で起動しない問題をたぶん修正 (WindowsGraphicsCapture関連の処理を WindowsGraphicsCapture.dllに移動させて、動的にロードするようにした)
+・[change] ウマ娘ウィンドウが横画面の時は、TextRecognizerを実行しないようにした (CPU負荷対策)
+・[fix] 選択肢の候補が複数ある時、より類似度の高い方を選ぶようにした #90
+・[fix] イベント名末尾にある"①"や"（イベント進行①）"などの文字列を取り除いた (選択肢検出の精度を上げるため)
+・[fix] 画面取り込み方式に Windows Graphics Captureを選択した時に、画面取り込み実行時に古いフレームを取り込んでしまうのを修正
+
+・[update]UmaMusumeLibrary.json更新 2021-12-23
+- キャラ
+【疾風迅雷】タマモクロス
+- サポート
+［まだ見ぬ景色を求めて］サイレンススズカ
+
+・[update]UmaMusumeLibrary.json更新 2021-12-16
+- キャラ
+【Noble Seamair】ファインモーション
+- サポート
+［独奏・螺旋追走曲］マンハッタンカフェ
+［泥濘一笑、真っつぐに］イナリワン
+
+・[update] SkillLibrary.jsonに「真っ向勝負」を追加
+
+
+・[update]UmaMusumeLibrary.json更新 2021-11-30
+- キャラ
+【キセキの白星】オグリキャップ
+【ノエルージュ・キャロル】ビワハヤヒデ
+- サポート
+［フォーメーション：PARTY］マヤノトップガン
+［いじっぱりのマルクト］ナリタタイシン
+［スノウクリスタル・デイ］マーベラスサンデー
+
+・[fix] 表示されるイベント名と選択肢の内容が異なるバグを修正
+・[update] 開発環境をVisual Studio 2019 から Visual Studio 2022 へ変更
+
+・[update]UmaMusumeLibrary.json更新 2021-11-20
+- キャラ
+【ツイステッド・ライン】メジロドーベル
+- サポート
+[おどれ・さわげ・フェスれ！]ダイタクヘリオス
+［うるさい監視役］ウオッカ
+
+・[update]UmaMusumeLibrary.json更新 2021-11-09
+- キャラ
+【ポップス☆ジョーカー】トーセンジョーダン
+
+v1.17
+・[fix] 設定でスリーショット保存先のフォルダ選択ダイアログを開くと応答停止状態になるバグを修正 #85 
+・[fix] イベント名の認識に利用する画像にゴミが混ざり認識できないことがあるのを修正 #86 
+
+
+・[update]UmaMusumeLibrary.json更新 2021-10-28
+- キャラ
+【皓月の弓取り】シンボリルドルフ
+【秋桜ダンツァトリーチェ】ゴールドシチー
+- サポート
+［かなし君、うつくし君］カレンチャン
+［天嗤う鏑矢］ナリタブライアン
+［宵照らす奉納舞］ユキノビジン
+
+v1.16
+・[add] 画面取り込みに Windows Graphics Capture APIを使ったものを追加
+・[change] 画面取り込み方式のデフォルトをGDIに変更した
+・[fix] スタートとストップを繰り返すとメモリリークするバグを修正
+
+・[update]UmaMusumeLibrary.json更新 2021-10-23
+- キャラ
+【Creeping Black】マンハッタンカフェ
+- サポート
+［43、8、1］ナカヤマフェスタ
+［一等星は揺らがない］シリウスシンボリ
+
+----
+・[update]UmaMusumeLibrary.json更新 2021-10-12
+- キャラ
+【プリンセス・オブ・ピンク】カワカミプリンセス
+
+・[update]UmaMusumeLibrary.json更新 2021-09-30
+- キャラ
+【Make up Vampire!】ライスシャワー
+【シフォンリボンマミー】スーパークリーク
+- サポート
+［やったれハロウィンナイト！］タマモクロス
+［魔力授かりし英雄］ゼンノロブロイ
+［幽霊さんとハロウィンの魔法］ミホノブルボン
+
+v1.15.3
+・[fix] メインとは別のグラボに繋がれたモニターにウマ娘ウィンドウが存在するときに、画面取り込みができないバグを修正 #80
+
+v1.15.2
+・[fix] モニターが回転していると正常に画面取り込みできなかったバグを修正
+・[fix] セイウンスカイ(サポート)の連続イベントで間違った選択肢が出るのを修正 #77
+
+v1.15.1
+・[fix] 高DPI環境で、スタートを押した瞬間ウィンドウの拡大スケーリングが解除される問題を修正
+
+v1.15
+・[change] ウマ娘ウィンドウの画面取り込みを GDIを使ったものから Desktop Duplication APIを使ったものに変更
+・[change] レース予約の通知を、日付変更時ではなく、育成画面になったときに行うように変更 #78
+・[fix] CurrentMenuBoundsで切り取りイメージをグレー化してからTextFromImageするように変更
+
+・[update]UmaMusumeLibrary.json更新
+- キャラ
+【超特急！フルカラー特殊PP】アグネスデジタル
+- サポート
+[心と足元は温かく]イクノディクタス
+[GRMAラーメン♪]ファインモーション
+
+・[update] UmaMusumeLibrary.json更新
+- キャラ
+【ボーノ☆アラモーダ】ヒシアケボノ
+
+v1.14
+・[fix] アオハル杯では、現在の日付が取得できなかったのを修正
+・[add] レース一覧に、予約レースまでのターン数表示を追加 #74
+・[fix] フジキセキの二つ名のtypo修正 #75
+・[update] UmaMusumeLibrary.json更新
+- キャラ
+【吉兆・初あらし】マチカネフクキタル
+- サポート
+［徹底管理主義］樫本理子
+［幸せは曲がり角の向こう］ライスシャワー
+
+
+・[update] UmaMusumeLibrary.json更新
+- サポート
+［WINNING DREAM］サイレンススズカ
+
+・[update] UmaMusumeLibrary.json更新
+- キャラ
+【Meisterschaft】エイシンフラッシュ
+- サポート
+［願いまでは拭わない］ナイスネイチャ
+［響き合うストレイン］ビワハヤヒデ
+［nail on Turf］トーセンジョーダン
+
+・[update] UmaMusumeLibrary.json更新
+- キャラ
+【ブルー/レイジング】メイショウドトウ
+
+v1.13
+・[fix] AmbiguousSearchEventで、イベント名と下部選択肢の類似度を比較して高い方のイベントを返すように変更 #66
+・[add] スタート押したときに一度だけ能力詳細からウマ娘名を取得するようにした #70
+・[fix] Releaseビルドが通らなかったのを修正
+・[update] UmaMusumeLibrary.json更新
+
+・[update] UmaMusumeLibrary.json更新
+- キャラ
+【オーセンティック/1928】ゴールドシチー
+- サポート
+［Two Pieces］ナリタブライアン
+［集まってコンステレーション］ツインターボ
+
+・[add] BuildUmaMusumeLibrary.py エラー発生時に中断する処理を追加
+・[change] BuildUmaMusumeLibrary.py DeleteSuccessFailedOnlyとNomarizeEventSuccessFailedをAddCharactorEventとUpdateEventの後に移動させた
+・[update] SkillLibrary.json更新
+・[update] UmaMusumeLibrary.jsonの更新
+- キャラ
+【シューティンスタァ・ルヴゥ】フジキセキ
+- サポート
+［爽快!ウィニングショット!］メジロライアン
+［その心に吹きすさぶ］メジロアルダン
 
 v1.12
 ・[add] 設定からスクリーンショットの保存フォルダを設定できるようになった #65 (PullRequest thx!)

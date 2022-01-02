@@ -14,7 +14,7 @@ struct Config
 	bool	autoStart = true;
 	bool	stopUpdatePreviewOnTraining = true;
 	bool 	autoCheckDB = true;
-	bool 	autoCheckUpgrade =true;
+	bool 	autoCheckUpgrade = false;
 	bool	notifyFavoriteRaceHold = true;
 	enum Theme {
 		kAuto, kDark, kLight,
@@ -23,11 +23,17 @@ struct Config
 	bool	windowTopMost = false;
 	boost::filesystem::path screenShotFolder;
 	I18N::CODE_639_3166 language = I18N::CODE_639_3166::en_US;
+
+	enum ScreenCaptureMethod {
+		kGDI, kDesktopDuplication, kWindowsGraphicsCapture,
+	};
+	ScreenCaptureMethod	screenCaptureMethod = kGDI;
+
 	bool	LoadConfig();
 	void	SaveConfig();
 	I18N	i18n;
 	CFont	gFont;
-	LPCWSTR kAppVersion = L"v1.12-sp1" DEBUG_STRING;
-	LPCWSTR	bAppVersion = L"v1.12";
+	LPCWSTR kAppVersion = L"v1.18-rc0" DEBUG_STRING;
+	LPCWSTR	bAppVersion = L"v1.18";
 };
 

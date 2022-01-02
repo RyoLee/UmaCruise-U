@@ -16,15 +16,16 @@ class UmaTextRecognizer
 	static constexpr double kMinWhiteTextRatioThreshold = 0.05;	// 画像中の白文字率の閾値
 	static constexpr double kBlueBackgroundThreshold = 0.7;	// 青背景率の閾値
 	static constexpr int kBackButtonExistThreshold = 200;	// 戻るボタンの文字列を分ける閾値
-	
+	static constexpr double kAbilityDetailThreshold = 0.3;	// 能力詳細の範囲内文字率の閾値
+
 	static constexpr double kResizeScale = 2.0;	// 拡大倍率
 
 public:
 	bool	LoadSetting();
 
-	std::unique_ptr<Gdiplus::Bitmap>	ScreenShot();
+	std::wstring	GetIkuseiUmaMusumeName(Gdiplus::Bitmap* image);
 
-	bool	TextRecognizer(Gdiplus::Bitmap* image = nullptr);
+	bool	TextRecognizer(Gdiplus::Bitmap* image);
 
 	const std::vector<std::wstring>&	GetUmaMusumeName() const {
 		return m_umaMusumeName;
@@ -41,6 +42,9 @@ public:
 	bool	IsTrainingMenu() const {
 		return m_bTrainingMenu;
 	}
+	bool	IsIkuseiTop() const {
+		return m_bIkuseiTop;
+	}
 	int		GetEntryRaceDistance() const {
 		return m_entryRaceDistance;
 	}
@@ -51,16 +55,16 @@ private:
 
 	bool	_IsEventNameIcon(cv::Mat srcImage);
 
-	CString	m_targetWindowName;
-	CString m_targetClassName;
+	cv::Mat	_InRangeHSVTextColorBounds(cv::Mat cutImage);
 
 	CSize	m_baseClientSize;
 
 	enum TestBounds {
-		kUmaMusumeSubNameBounds, kUmaMusumeNameBounds, kCurrentTurnBounds, kEventCategoryBounds, kEventNameBounds, kEventNameIconBounds, kEventBottomOptionBounds, kCurrentMenuBounds, kBackButtonBounds, kRaceDetailBounds, kIkuseiUmaMusumeSubNameBounds, kIkuseiUmaMusumeNameBounds,  kMaxCount
+		kUmaMusumeSubNameBounds, kUmaMusumeNameBounds, kURACurrentTurnBounds, kAoharuCurrentTurnBounds, kEventCategoryBounds, kEventNameBounds, kEventNameIconBounds, kEventBottomOptionBounds, kCurrentMenuBounds, kBackButtonBounds, kRaceDetailBounds, kIkuseiUmaMusumeSubNameBounds, kIkuseiUmaMusumeNameBounds, kAbilityDetailBounds,
+		kMaxCount
 	};
 	static constexpr LPCWSTR kTestBoundsName[kMaxCount] = {
-		L"UmaMusumeSubNameBounds", L"UmaMusumeNameBounds", L"CurrentTurnBounds", L"EventCategoryBounds", L"EventNameBounds", L"EventNameIconBounds", L"EventBottomOptionBounds", L"CurrentMenuBounds", L"BackButtonBounds", L"RaceDetailBounds", L"IkuseiUmaMusumeSubNameBounds", L"IkuseiUmaMusumeNameBounds"
+		L"UmaMusumeSubNameBounds", L"UmaMusumeNameBounds", L"URACurrentTurnBounds", L"AoharuCurrentTurnBounds", L"EventCategoryBounds", L"EventNameBounds", L"EventNameIconBounds", L"EventBottomOptionBounds", L"CurrentMenuBounds", L"BackButtonBounds", L"RaceDetailBounds", L"IkuseiUmaMusumeSubNameBounds", L"IkuseiUmaMusumeNameBounds", L"AbilityDetailBounds"
 	};
 	std::array<CRect, kMaxCount>	m_testBounds;
 	std::unordered_map<std::wstring, std::wstring>	m_typoDictionary;
@@ -77,6 +81,7 @@ private:
 	std::vector<std::wstring>	m_eventName;
 	std::vector<std::wstring>	m_eventBottomOption;
 	bool						m_bTrainingMenu = false;
+	bool						m_bIkuseiTop = false;
 	int							m_entryRaceDistance = 0;
 
 };

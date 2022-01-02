@@ -12,6 +12,7 @@
 #define IDC_BUTTON_SCREENSHOT           1000
 #define IDC_EDIT_EVENTNAME              1001
 #define IDC_EDIT_EVENT_SOURCE           1002
+#define IDC_EDIT_REMAININGTURN          1007
 #define IDC_EDIT_NOWDATE                1008
 #define IDC_LIST_RACE                   1009
 #define IDC_COMBO_UMAMUSUME             1010
@@ -68,6 +69,11 @@
 #define IDC_EDIT_SS_FOLDER              1074
 #define IDC_BUTTON_SS_SELECT            1075
 #define IDC_STATIC_SS_TEXT              1076
+#define IDC_RADIO_GDI                   1077
+#define IDC_RADIO_DESKTOPDUPLICATION    1078
+#define IDC_RADIO_WINDOWSGRAPHICSCAPTURE 1079
+#define IDC_STATIC_CAPTURE_GROUP        1080
+#define IDC_STATIC_CAPTURE_TEXT         1081
 
 #define IDC_RICHEDIT21                  1150
 #define IDC_RICHEDIT22                  1151
@@ -152,6 +158,8 @@
 #define STR_DOWNLOAD_FAILED             -1515
 #define STR_ERROR_COMMON_LOAD_FAILED    -1516
 #define STR_ERROR_HTTP_CODE             -1517
+#define STR_COUNT_DOWN_LEFT             -1518
+#define STR_COUNT_DOWN_CUR              -1519
 
 #define STR_NO_SS_DIR                   -1600
 

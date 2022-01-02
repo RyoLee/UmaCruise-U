@@ -25,7 +25,7 @@ public:
 		NOTIFY_HANDLER(IDC_SYSLINK_DB, NM_CLICK, OnLinkClickDB)
 		NOTIFY_HANDLER(IDC_SYSLINK_HOMEPAGE, NM_CLICK, OnLinkClickHomePage)
 		NOTIFY_HANDLER(IDC_SYSLINK_ORI_HOMEPAGE, NM_CLICK, OnLinkClickOriHomePage)
-		NOTIFY_HANDLER(IDC_SYSLINK_VERSIONCHECK, NM_CLICK, OnLinkClickLatestVersion)
+		NOTIFY_HANDLER(IDC_SYSLINK_VERSIONCHECK, NM_CLICK, OnLinkClickLatestVersion )
 		
 		COMMAND_ID_HANDLER(IDC_BUTTON_OCR, OnOCR)
 		CHAIN_MSG_MAP(DarkModeUI<CAboutDlg>)
@@ -51,10 +51,10 @@ private:
 	PreviewWindow& m_previewWindow;
 
 	enum TestBounds {
-		kDirect, kUmaMusumeSubNameBounds, kUmaMusumeNameBounds, kCurrentTurnBounds, kEventCategoryBounds, kEventNameBounds, kEventNameIconBounds, kEventBottomOptionBounds, kCurrentMenuBounds, kRaceDetailBounds, kIkuseiUmaMusumeSubNameBounds, kIkuseiUmaMusumeNameBounds, kMaxCount
+		kDirect, kURACurrentTurnBounds, kAoharuCurrentTurnBounds, kEventCategoryBounds, kEventNameBounds, kEventNameIconBounds, kEventBottomOptionBounds, kCurrentMenuBounds, kRaceDetailBounds, kIkuseiUmaMusumeSubNameBounds, kIkuseiUmaMusumeNameBounds, kMaxCount
 	};
 	static constexpr LPCWSTR kTestBoundsName[kMaxCount] = {
-		L"Direct", L"UmaMusumeSubNameBounds", L"UmaMusumeNameBounds", L"CurrentTurnBounds", L"EventCategoryBounds", L"EventNameBounds", L"EventNameIconBounds", L"EventBottomOptionBounds", L"CurrentMenuBounds", L"RaceDetailBounds", L"IkuseiUmaMusumeSubNameBounds", L"IkuseiUmaMusumeNameBounds"
+		L"Direct", L"URACurrentTurnBounds", L"AoharuCurrentTurnBounds", L"EventCategoryBounds", L"EventNameBounds", L"EventNameIconBounds", L"EventBottomOptionBounds", L"CurrentMenuBounds", L"RaceDetailBounds", L"IkuseiUmaMusumeSubNameBounds", L"IkuseiUmaMusumeNameBounds"
 	};
 
 

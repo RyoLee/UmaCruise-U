@@ -18,11 +18,17 @@
 #include "Utility\WinHTTPWrapper.h"
 #include "win32-darkmode\DarkMode.h"
 
+#include "GDIWindowCapture.h"
+#include "DesktopDuplication.h"
+#include "WindowsGraphicsCaptureWrapper.h"
+
 #include "ConfigDlg.h"
 
+using namespace WinHTTPWrapper;
 using json = nlohmann::json;
 using namespace CodeConvert;
 using namespace cv;
+
 
 bool IsDarkMode()
 {
@@ -107,6 +113,7 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	for (int i = 0; i < std::size(m_brsOptions); ++i) {
 		m_brsOptions[i].CreateSolidBrush(m_optionBkColor[i]);
 	}
+
 	// デフォルトフォント取得
 	CEdit edit = GetDlgItem(IDC_EDIT_OPTION1);
 	HFONT font = edit.GetFont();
@@ -134,19 +141,8 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	});
 
 	// UmaMusumeLibraryを読み込み
-	if (!m_umaEventLibrary.LoadUmaMusumeLibrary()) {
-		ERROR_LOG << L"LoadUmaMusumeLibrary failed";
-		ATLASSERT(FALSE);
-	} else {
-		// 育成ウマ娘のリストをコンボボックスに追加
-		CString currentProperty;
-		for (const auto& uma : m_umaEventLibrary.GetIkuseiUmaMusumeEventList()) {
-			if (currentProperty != uma->property.c_str()) {
-				currentProperty = uma->property.c_str();
-				m_cmbUmaMusume.AddString(currentProperty);
-			}
-			m_cmbUmaMusume.AddString(uma->name.c_str());
-		}
+	if (!_ReloadUmaMusumeLibrary()) {
+		MessageBox(L"LoadUmaMusumeLibrary failed");
 	}
 
 	// SkillLibraryを読み込み
@@ -250,11 +246,12 @@ LRESULT CMainDlg::OnDestroy(UINT, WPARAM, LPARAM, BOOL&)
 	if (m_threadAutoDetect.joinable()) {
 		m_cancelAutoDetect = true;
 		m_threadAutoDetect.detach();
-		::Sleep(2 * 1000);
+		::Sleep(5 * 1000);
 	}
 
 	return 0;
 }
+
 
 LRESULT CMainDlg::OnAppAbout(WORD, WORD, HWND, BOOL&)
 {
@@ -351,6 +348,7 @@ LRESULT CMainDlg::OnCancel(WORD, WORD wID, HWND, BOOL&)
 void CMainDlg::OnShowConfigDlg(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
 	const int prevTheme = m_config.theme;
+	const int prevSCMethod = m_config.screenCaptureMethod;
 	ConfigDlg dlg(m_config);
 	auto ret = dlg.DoModal(m_hWnd);
 	if (ret == IDOK) {
@@ -360,6 +358,10 @@ void CMainDlg::OnShowConfigDlg(UINT uNotifyCode, int nID, CWindow wndCtl)
 			m_raceListWindow.OnThemeChanged();
 			m_previewWindow.OnThemeChanged();
 			m_popupRichEdit.OnThemeChanged();
+		}
+		if (prevSCMethod != m_config.screenCaptureMethod) {
+			std::unique_lock lock(m_mtxScreennShotWindow);
+			m_screenshotWindow.reset();
 		}
 
 		SetWindowPos(m_config.windowTopMost ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);	
@@ -507,13 +509,14 @@ void CMainDlg::OnScreenShot(UINT uNotifyCode, int nID, CWindow wndCtl)
 
 			_UpdateEventOptions(*optUmaEvent);
 
-			m_eventSource = m_umaEventLibrary.GetLastEventSource().c_str();
+			m_eventSource = optUmaEvent->parentCharaEvent->name.c_str();
 			DoDataExchange(DDX_LOAD, IDC_EDIT_EVENT_SOURCE);
 		}
 
 
 		// 現在ターン
-		m_raceListWindow.AnbigiousChangeCurrentTurn(m_umaTextRecoginzer.GetCurrentTurn());
+		bool ikuseiTop = m_umaTextRecoginzer.IsTrainingMenu() || m_umaTextRecoginzer.IsIkuseiTop();
+		m_raceListWindow.AnbigiousChangeCurrentTurn(m_umaTextRecoginzer.GetCurrentTurn(), ikuseiTop);
 
 		// レース距離
 		m_raceListWindow.EntryRaceDistance(m_umaTextRecoginzer.GetEntryRaceDistance());
@@ -547,14 +550,17 @@ void CMainDlg::OnScreenShot(UINT uNotifyCode, int nID, CWindow wndCtl)
 			ssPath = ssFolderPath / L"screenshot.png";
 		}
 		// 
-		auto image = m_umaTextRecoginzer.ScreenShot();
+		auto image = _ScreenShotUmaWindow();
 		if (!image) {
 			ChangeWindowTitle(m_config.i18n.GetWSText(STR_SS_FAILED));
 			return;
 		}
+
 		auto pngEncoder = GetEncoderByMimeType(L"image/png");
 		auto ret = image->Save(ssPath.c_str(), &pngEncoder->Clsid);
 		bool success = ret == Gdiplus::Ok;
+		//bool success = SaveWindowScreenShot(hwndTarget, ssPath.wstring());
+		//bool success = SaveScreenShot(L"", ssPath.wstring());
 		ATLASSERT(success);
 
 		m_previewWindow.UpdateImage(ssPath.wstring());
@@ -576,15 +582,55 @@ void CMainDlg::OnStart(UINT uNotifyCode, int nID, CWindow wndCtl)
 		{
 			INFO_LOG << L"thread begin";
 
+			auto funcChangeIkuseiUmaMusumeName = [this](const std::vector<std::wstring>& umaMusumeNameList) {
+				std::wstring prevUmaName = m_umaEventLibrary.GetCurrentIkuseiUmaMusume();
+				m_umaEventLibrary.AnbigiousChangeIkuseImaMusume(umaMusumeNameList);
+				std::wstring nowUmaName = m_umaEventLibrary.GetCurrentIkuseiUmaMusume();
+				if (prevUmaName != nowUmaName) {
+					// コンボボックスを変更
+					const int count = m_cmbUmaMusume.GetCount();
+					for (int i = 0; i < count; ++i) {
+						CString name;
+						m_cmbUmaMusume.GetLBText(i, name);
+						if (name == nowUmaName.c_str()) {
+							m_cmbUmaMusume.SetCurSel(i);
+							break;
+						}
+					}
+				}
+			};
+
+			// 初回のみ能力詳細からウマ娘名を取得する
+			auto ssImage2 = _ScreenShotUmaWindow();
+			std::wstring ikuseiUmaMusumeName =  m_umaTextRecoginzer.GetIkuseiUmaMusumeName(ssImage2.get());
+			if (ikuseiUmaMusumeName.length()) {
+				funcChangeIkuseiUmaMusumeName(std::vector<std::wstring>({ ikuseiUmaMusumeName }));
+			}
+			ssImage2.reset();
+
+			const auto milisecInterval = m_config.refreshInterval * 1000;
 			int count = 0;
 			while (!m_cancelAutoDetect.load()) {
 				Utility::timer timer;
 
 				const auto begin = std::chrono::steady_clock::now();
 
-				auto ssImage = m_umaTextRecoginzer.ScreenShot();
+				auto ssImage = _ScreenShotUmaWindow();	// m_umaTextRecoginzer.ScreenShot();
+				if (ssImage) {
+					const int imageWidth = ssImage->GetWidth();
+					const int imageHeight = ssImage->GetHeight();
+					if (imageHeight < imageWidth) {	// 横画面なら何もしない
+						m_previewWindow.UpdateImage(ssImage.release());
+						::Sleep(milisecInterval);
+						continue;
+					}
+				}
 				bool success = m_umaTextRecoginzer.TextRecognizer(ssImage.get());
 				if (success) {
+					if (m_cancelAutoDetect.load()) {
+						break;	// cancel
+					}
+
 					bool updateImage = true;
 					if (m_config.stopUpdatePreviewOnTraining && !m_umaTextRecoginzer.IsTrainingMenu()) {
 						updateImage = false;
@@ -594,21 +640,7 @@ void CMainDlg::OnStart(UINT uNotifyCode, int nID, CWindow wndCtl)
 					}
 
 					// 育成ウマ娘名
-					std::wstring prevUmaName = m_umaEventLibrary.GetCurrentIkuseiUmaMusume();
-					m_umaEventLibrary.AnbigiousChangeIkuseImaMusume(m_umaTextRecoginzer.GetUmaMusumeName());
-					std::wstring nowUmaName = m_umaEventLibrary.GetCurrentIkuseiUmaMusume();
-					if (prevUmaName != nowUmaName) {
-						// コンボボックスを変更
-						const int count = m_cmbUmaMusume.GetCount();
-						for (int i = 0; i < count; ++i) {
-							CString name;
-							m_cmbUmaMusume.GetLBText(i, name);
-							if (name == nowUmaName.c_str()) {
-								m_cmbUmaMusume.SetCurSel(i);
-								break;
-							}
-						}
-					}
+					funcChangeIkuseiUmaMusumeName(m_umaTextRecoginzer.GetUmaMusumeName());
 
 					// イベント検索
 					auto optUmaEvent = m_umaEventLibrary.AmbiguousSearchEvent(
@@ -620,13 +652,14 @@ void CMainDlg::OnStart(UINT uNotifyCode, int nID, CWindow wndCtl)
 
 						_UpdateEventOptions(*optUmaEvent);
 
-						m_eventSource = m_umaEventLibrary.GetLastEventSource().c_str();
+						m_eventSource = optUmaEvent->parentCharaEvent->name.c_str();
 						DoDataExchange(DDX_LOAD, IDC_EDIT_EVENT_SOURCE);
 					}
 
 
 					// 現在ターン
-					m_raceListWindow.AnbigiousChangeCurrentTurn(m_umaTextRecoginzer.GetCurrentTurn());
+					bool ikuseiTop = m_umaTextRecoginzer.IsTrainingMenu() || m_umaTextRecoginzer.IsIkuseiTop();
+					m_raceListWindow.AnbigiousChangeCurrentTurn(m_umaTextRecoginzer.GetCurrentTurn(), ikuseiTop);
 
 					// レース距離
 					m_raceListWindow.EntryRaceDistance(m_umaTextRecoginzer.GetEntryRaceDistance());
@@ -637,7 +670,6 @@ void CMainDlg::OnStart(UINT uNotifyCode, int nID, CWindow wndCtl)
 					ChangeWindowTitle((LPCWSTR)title);
 
 					// wait
-					const auto milisecInterval = m_config.refreshInterval * 1000;
 					auto end = std::chrono::steady_clock::now();
 					auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
 					do {
@@ -661,6 +693,11 @@ void CMainDlg::OnStart(UINT uNotifyCode, int nID, CWindow wndCtl)
 				}
 			}
 			// finish
+			{
+				std::unique_lock lock(m_mtxScreennShotWindow);
+				m_screenshotWindow.reset();
+			}
+
 			if (m_threadAutoDetect.joinable()) {
 				CButton btnStart = GetDlgItem(IDC_CHECK_START);
 				btnStart.SetWindowText(m_config.i18n.GetCSText(IDC_CHECK_START));
@@ -693,7 +730,7 @@ void CMainDlg::OnEventNameChanged(UINT uNotifyCode, int nID, CWindow wndCtl)
 		ChangeWindowTitle(optUmaEvent->eventName);
 		_UpdateEventOptions(*optUmaEvent);
 
-		m_eventSource = m_umaEventLibrary.GetLastEventSource().c_str();
+		m_eventSource = optUmaEvent->parentCharaEvent->name.c_str();
 		DoDataExchange(DDX_LOAD, IDC_EDIT_EVENT_SOURCE);
 	}
 	
@@ -890,6 +927,33 @@ void CMainDlg::OnScreenShotButtonUp(UINT nFlags, CPoint point)
 	::ShellExecute(NULL, NULL, ssFolderPath.c_str(), NULL, NULL, SW_NORMAL);
 }
 
+bool CMainDlg::_ReloadUmaMusumeLibrary()
+{
+	if (!m_umaEventLibrary.LoadUmaMusumeLibrary()) {
+		ERROR_LOG << L"LoadUmaMusumeLibrary failed";
+		ATLASSERT(FALSE);
+		return false;
+	} else {
+		// 育成ウマ娘のリストをコンボボックスに追加
+		m_cmbUmaMusume.ResetContent();
+
+		const std::wstring& currentIkuseiUmaMusume = m_umaEventLibrary.GetCurrentIkuseiUmaMusume();
+
+		CString currentProperty;
+		for (const auto& uma : m_umaEventLibrary.GetIkuseiUmaMusumeEventList()) {
+			if (currentProperty != uma->property.c_str()) {
+				currentProperty = uma->property.c_str();
+				m_cmbUmaMusume.AddString(currentProperty);
+			}
+
+			int n = m_cmbUmaMusume.AddString(uma->name.c_str());
+			if (uma->name == currentIkuseiUmaMusume) {
+				m_cmbUmaMusume.SetCurSel(n);
+			}
+		}
+	}
+	return true;
+}
 void CMainDlg::_InitRaceListWindow(){
 	INFO_LOG << L"initializing racelist windows...";
 
@@ -918,17 +982,19 @@ void CMainDlg::_ExtentOrShrinkWindow(bool bExtent)
 	int windowWidth = 0;
 	if (bExtent) {
 		ATLASSERT(IsChild(m_raceListWindow));
-		CRect rcRaceListGroup;
+		CRect rcClientGroup;
 		CWindow wndRaceListGroup = m_raceListWindow.GetDlgItem(IDC_STATIC_RACELIST_GROUP);
-		wndRaceListGroup.GetClientRect(&rcRaceListGroup);
-		wndRaceListGroup.MapWindowPoints(m_hWnd, &rcRaceListGroup);
-		windowWidth = rcRaceListGroup.right;
+		wndRaceListGroup.GetClientRect(&rcClientGroup);
+		wndRaceListGroup.MapWindowPoints(m_hWnd, &rcClientGroup);
+		windowWidth = rcClientGroup.right;
+
 		m_raceListWindow.SetWindowPos(NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 	} else {
-		CRect rcOptGroup;
-		GetDlgItem(IDC_STATIC_OPT_GROUP).GetClientRect(&rcOptGroup);
-		GetDlgItem(IDC_STATIC_OPT_GROUP).MapWindowPoints(m_hWnd, &rcOptGroup);
-		windowWidth = rcOptGroup.right;
+		CRect rcCtrl;
+		GetDlgItem(IDC_BUTTON_SHOWHIDE_RACELIST).GetClientRect(&rcCtrl);
+		GetDlgItem(IDC_BUTTON_SHOWHIDE_RACELIST).MapWindowPoints(m_hWnd, &rcCtrl);
+		windowWidth = rcCtrl.right;
+
 		m_raceListWindow.SetWindowPos(NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_HIDEWINDOW);
 	}
 	//AdjustWindowRectEx(&rcCtrl, GetStyle(), FALSE, GetExStyle());
@@ -1026,11 +1092,51 @@ void CMainDlg::_UpdateEventEffect(CRichEditCtrl richEdit, const std::wstring& ef
 	
 	richEdit.SetSel(0, 0);
 }
+
+std::unique_ptr<Gdiplus::Bitmap> CMainDlg::_ScreenShotUmaWindow()
+{
+	std::unique_lock lock(m_mtxScreennShotWindow);
+	if (!m_screenshotWindow) {
+		switch (m_config.screenCaptureMethod) {
+		case Config::kGDI:
+			m_screenshotWindow.reset(new GDIWindowCapture());
+			break;
+
+		case Config::kDesktopDuplication:
+			m_screenshotWindow.reset(new DesktopDuplication());
+			break;
+
+		case Config::kWindowsGraphicsCapture:
+			if (WindowsGraphicsCaptureWrapper::IsDllLoaded()) {
+				m_screenshotWindow.reset(WindowsGraphicsCaptureWrapper::CreateWindowsGraphicsCapture());
+			} else {
+				m_screenshotWindow.reset(new GDIWindowCapture());
+			}
+			break;
+
+		default:
+			ERROR_LOG << L"m_config.screenCaptureMethod is unknown";
+			ATLASSERT(FALSE);
+			m_screenshotWindow.reset(new GDIWindowCapture());
+			//return nullptr;
+		}
+	}
+
+	LPCWSTR className = m_targetClassName.GetLength() ? (LPCWSTR)m_targetClassName : nullptr;
+	LPCWSTR windowName = m_targetWindowName.GetLength() ? (LPCWSTR)m_targetWindowName : nullptr;
+	CWindow hwndTarget = ::FindWindow(className, windowName);
+	if (!hwndTarget) {
+		return nullptr;
+	}
+
+	auto ss = m_screenshotWindow->ScreenShot(hwndTarget);
+	return ss;
+}
 void CMainDlg::_CheckUmaCruiseU(){
 	
 	CString versionURL = L"https://cdn.jsdelivr.net/gh/RyoLee/UmaCruise-U@master/appversion.txt";
 	CString upgradeURL = L"https://cdn.jsdelivr.net/gh/RyoLee/UmaCruise-U@res/UmaCruise-U.7z";
-	if (auto optVersion = WinHTTPWrapper::HttpDownloadData(versionURL)) {
+	if (auto optVersion = HttpDownloadData(versionURL)) {
 		std::wstring latestVersion = UTF16fromUTF8(optVersion.get());
 		boost::algorithm::trim_all(latestVersion);
 		if (latestVersion !=  m_config.kAppVersion) {
@@ -1071,18 +1177,18 @@ void CMainDlg::_CheckUmaLibrary(I18N::CODE_639_3166 language)
 		auto umaLibraryPath = GetExeDirectory() / L"UmaLibrary" / L"UmaMusumeLibrary.json";
 		const DWORD umaLibraryFileSize = static_cast<DWORD>(fs::file_size(umaLibraryPath));
 
-		WinHTTPWrapper::CUrl downloadUrl(libraryURL.c_str());
-		auto hConnect = WinHTTPWrapper::HttpConnect(downloadUrl);
-		auto hRequest = WinHTTPWrapper::HttpOpenRequest(downloadUrl, hConnect, L"HEAD", L"", true);
-		if (WinHTTPWrapper::HttpSendRequestAndReceiveResponse(hRequest)) {
-			int statusCode = WinHTTPWrapper::HttpQueryStatusCode(hRequest);
+		CUrl downloadUrl(libraryURL.c_str());
+		auto hConnect = HttpConnect(downloadUrl);
+		auto hRequest = HttpOpenRequest(downloadUrl, hConnect, L"HEAD", L"", true);
+		if (HttpSendRequestAndReceiveResponse(hRequest)) {
+			int statusCode = HttpQueryStatusCode(hRequest);
 			if (statusCode == 200) {
 				DWORD contentLength = 0;
 				HttpQueryHeaders(hRequest, WINHTTP_QUERY_CONTENT_LENGTH, contentLength);
 				if (umaLibraryFileSize != contentLength) {	// ファイルサイズ比較
 					if(MessageBox(m_config.i18n.GetCSText(STR_NEW_LIB), L"Update", MB_ICONINFORMATION|MB_YESNO)==IDYES)
 					{
-						auto optDLData = WinHTTPWrapper::HttpDownloadData(downloadUrl.GetURL());
+						auto optDLData = HttpDownloadData(downloadUrl.GetURL());
 						if (optDLData) {
 							fs::remove(umaLibraryPath);
 							SaveFile(umaLibraryPath, optDLData.get());

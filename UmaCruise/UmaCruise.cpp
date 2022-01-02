@@ -13,6 +13,7 @@
 #include "Utility\json.hpp"
 #include "TesseractWrapper.h"
 #include "win32-darkmode\DarkMode.h"
+#include "WindowsGraphicsCaptureWrapper.h"
 
 // グローバル変数
 CAppModule _Module;
@@ -80,7 +81,7 @@ int Run(LPTSTR /*lpstrCmdLine*/ = NULL, int nCmdShow = SW_SHOWDEFAULT)
 
 int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lpstrCmdLine, int nCmdShow)
 {
-	HRESULT hRes = ::CoInitialize(NULL);
+	HRESULT hRes = CoInitializeEx(NULL, COINIT_MULTITHREADED/*COINIT_APARTMENTTHREADED*/ | COINIT_DISABLE_OLE1DDE);
 	ATLASSERT(SUCCEEDED(hRes));
 
 	AtlInitCommonControls(ICC_BAR_CLASSES);	// add flags to support other controls
@@ -102,9 +103,26 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 		g_funcSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED);
 	}
 
+	// https://stackoverflow.com/questions/63855309/process-unexpectedly-dpi-aware
+	// DuplicateOutput が勝手に SetProcessDpiAwarenessContext を呼ぶ対策
+	using SetProcessDpiAwarenessContextFunc = BOOL(*)(_In_ DPI_AWARENESS_CONTEXT value);
+	auto funcSetProcessDpiAwarenessContext = (SetProcessDpiAwarenessContextFunc)::GetProcAddress(hModUser32, "SetProcessDpiAwarenessContext");
+	if (funcSetProcessDpiAwarenessContext) {
+		BOOL b = funcSetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED);
+	}
+
 	InitDarkMode();
 
+	bool bLoadWindowsGraphicsCaptureDll = false;
+	if (WindowsGraphicsCaptureWrapper::IsSupported()) {
+		bLoadWindowsGraphicsCaptureDll = WindowsGraphicsCaptureWrapper::LoadLibrary();
+	}
+
 	int nRet = Run(lpstrCmdLine, nCmdShow);
+
+	if (bLoadWindowsGraphicsCaptureDll) {
+		WindowsGraphicsCaptureWrapper::FreeLibrary();
+	}
 
 	g_funcSetThreadDpiAwarenessContext = nullptr;
 	::FreeLibrary(hModUser32);

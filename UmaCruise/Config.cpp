@@ -37,6 +37,7 @@ bool Config::LoadConfig()
 	windowTopMost = jsonSetting["Config"].value("WindowTopMost", windowTopMost);
 	language = jsonSetting["Config"].value("Language", language);
 	screenShotFolder = UTF16fromUTF8(jsonSetting["Config"].value("ScreenShotFolder", ""));
+	screenCaptureMethod = jsonSetting["Config"].value("ScreenCaptureMethod", screenCaptureMethod);
 	i18n.Load(language);
     return true;
 }
@@ -59,6 +60,7 @@ void Config::SaveConfig()
 	jsonSetting["Config"]["Theme"] = theme;
 	jsonSetting["Config"]["WindowTopMost"] = windowTopMost;
 	jsonSetting["Config"]["ScreenShotFolder"] = UTF8fromUTF16(screenShotFolder.wstring());
+	jsonSetting["Config"]["ScreenCaptureMethod"] = screenCaptureMethod;
 	jsonSetting["Config"]["Language"] = language;
 
 	std::ofstream ofs((GetExeDirectory() / "setting.json").wstring());

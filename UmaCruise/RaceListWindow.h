@@ -31,7 +31,7 @@ public:
 
 	void	ShowWindow(bool bShow);
 
-	void	AnbigiousChangeCurrentTurn(const std::vector<std::wstring>& ambiguousCurrentTurn);
+	void	AnbigiousChangeCurrentTurn(const std::vector<std::wstring>& ambiguousCurrentTurn, bool ikuseiTop);
 
 	void	EntryRaceDistance(int distance);
 
@@ -45,6 +45,7 @@ public:
 		// Race
 		DDX_TEXT(IDC_EDIT_NOWDATE, m_currentTurn)
 		DDX_CHECK(IDC_CHECK_SHOWRACE_AFTERCURRENTDATE, m_showRaceAfterCurrentDate)
+		DDX_TEXT(IDC_EDIT_REMAININGTURN, m_remainingTurn)
 
 		DDX_CHECK(IDC_CHECK_G1, m_gradeG1)
 		DDX_CHECK(IDC_CHECK_G2, m_gradeG2)
@@ -122,7 +123,8 @@ private:
 	Config&	m_config;
 	RaceDateLibrary	m_raceDateLibrary;
 
-	CString	m_currentTurn;
+	CString	m_currentTurn;	// 現在のターン
+	CString m_remainingTurn;	// 次のレースまでのターン数
 
 	bool	m_showRaceAfterCurrentDate = true;
 
@@ -174,5 +176,7 @@ private:
 	};
 	ThemeColor	m_darkTheme;
 	ThemeColor	m_lightTheme;
+
+	bool	m_bTurnChanged = false;
 };
 

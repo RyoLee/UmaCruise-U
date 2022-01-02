@@ -6,6 +6,7 @@
 
 #include <thread>
 #include <atomic>
+#include <memory>
 
 #include "UmaEventLibrary.h"
 #include "RaceDateLibrary.h"
@@ -22,7 +23,7 @@
 #include "I18N.h"
 
 #include "DarkModeUI.h"
-
+#include "IScreenShotWindow.h"
 
 class CMainDlg : 
 	public CDialogImpl<CMainDlg>, 
@@ -142,11 +143,16 @@ public:
 	void OnScreenShotButtonUp(UINT nFlags, CPoint point);
 
 private:
+	bool	_ReloadUmaMusumeLibrary();
 	void	_InitRaceListWindow();
 	void	_ExtentOrShrinkWindow(bool bExtent);
 	void	_ShowHideExOpts(bool bExtent);
+
 	void	_UpdateEventOptions(const UmaEventLibrary::UmaEvent& umaEvent);
 	void	_UpdateEventEffect(CRichEditCtrl richEdit, const std::wstring& effectText);
+
+	std::unique_ptr<Gdiplus::Bitmap>	_ScreenShotUmaWindow();
+
 	void 	_CheckUmaLibrary(I18N::CODE_639_3166 language);
 	void	_CheckUmaCruiseU();
 	Config	m_config;
@@ -182,4 +188,8 @@ private:
 
 	bool	m_bDockingMove = false;
 	CPoint	m_ptRelativeDockingPos;
+
+
+	std::mutex	m_mtxScreennShotWindow;
+	std::unique_ptr<IScreenShotWindow>	m_screenshotWindow;
 };

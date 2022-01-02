@@ -125,11 +125,29 @@ CRect GetTextBounds(cv::Mat cutImage, const CRect& rcBounds)
 	ATLASSERT(c == 1);
 	uchar zeroPointVal = thresImage.at<uchar>(0, 0);	// 背景色確認
 	ATLASSERT(zeroPointVal == 0 || zeroPointVal == 255);
+	
+	// イベント名の右端に黒帯が出る問題の対策
+	int rightPos = thresImage.cols;
+	// 左下から右に向かって黒帯の位置を確認する
+	for (int x = 0; x < thresImage.cols; x++) {
+		uchar val = thresImage.at<uchar>(thresImage.rows - 1, x);
+		if (val != zeroPointVal) {	// 背景色以外ならその位置を記録する
+			rightPos = x;
+			break;
+		}
+	}
+	// 黒帯発見
+	if (rightPos != thresImage.cols) {
+		enum { kBlackBandMargin = 10 };
+		if (kBlackBandMargin < rightPos) {
+			rightPos -= kBlackBandMargin;
+		}
+	}
 
 	CPoint ptLT = { thresImage.cols , thresImage.rows };
 	CPoint ptRB = { 0, 0 };
 	for (int y = 0; y < thresImage.rows; y++) {
-		for (int x = 0; x < thresImage.cols; x++) {
+		for (int x = 0; x < rightPos/*thresImage.cols*/; x++) {
 			uchar val = thresImage.at<uchar>(y, x);
 			if (val != zeroPointVal) {	// 背景色以外なら
 				// 見つかった時点で一番小さい地点を探す
@@ -154,6 +172,7 @@ CRect GetTextBounds(cv::Mat cutImage, const CRect& rcBounds)
 }
 
 // ==========================================================================
+// UmaTextRecognizer
 
 bool UmaTextRecognizer::LoadSetting()
 {
@@ -165,9 +184,6 @@ bool UmaTextRecognizer::LoadSetting()
 	}
 	json jsonCommon;
 	ifs >> jsonCommon;
-
-	m_targetWindowName = UTF16fromUTF8(jsonCommon["Common"]["TargetWindow"]["WindowName"].get<std::string>()).c_str();
-	m_targetClassName = UTF16fromUTF8(jsonCommon["Common"]["TargetWindow"]["ClassName"].get<std::string>()).c_str();
 
 	json jsonTestBounds = jsonCommon["Common"]["TestBounds"];
 
@@ -199,55 +215,55 @@ bool UmaTextRecognizer::LoadSetting()
 	return true;
 }
 
-std::unique_ptr<Gdiplus::Bitmap> UmaTextRecognizer::ScreenShot()
-{
-	LPCWSTR className = m_targetClassName.GetLength() ? (LPCWSTR)m_targetClassName : nullptr;
-	LPCWSTR windowName = m_targetWindowName.GetLength() ? (LPCWSTR)m_targetWindowName : nullptr;
-	CWindow hwndTarget = ::FindWindow(className, windowName);
-	if (!hwndTarget) {
-		return nullptr;
+
+// 育成ウマ娘名[能力詳細]
+std::wstring UmaTextRecognizer::GetIkuseiUmaMusumeName(Gdiplus::Bitmap* image)
+{	
+	if (!image) {
+		return L"";
+	}
+	cv::Mat srcImage = GdiPlusBitmapToOpenCvMat(image);
+	if (srcImage.empty()) {
+		ATLASSERT(FALSE);
+		ERROR_LOG << L"GdiPlusBitmapToOpenCvMat failed";
+		return L"";
 	}
 
-	CWindowDC dc(NULL/*hWndTarget*/);	// desktop
+	//Utility::timer timer;
 
-	if (g_funcSetThreadDpiAwarenessContext) {	// 高DPIモニターで取得ウィンドウの位置がずれるバグを回避するため
-		g_funcSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+	auto funcImageToText = [&, this](int testBoundsIndex, std::wstring& recognizerText) {
+		CRect rcName = _AdjustBounds(srcImage, m_testBounds[testBoundsIndex]);
+		if (!CheckCutBounds(srcImage, cvRectFromCRect(rcName), L"rcName")) {
+			return;
+		}
+		//Utility::timer timer;
+		cv::Mat cutImage(srcImage, cvRectFromCRect(rcName));
+		cv::Mat textImage = _InRangeHSVTextColorBounds(cutImage);
+
+		// 画像における白文字率を確認して、一定比率以下のときは無視する
+		const double whiteRatio = ImageWhiteRatio(textImage);
+		if (whiteRatio > kMinWhiteTextRatioThreshold) {
+			cv::Mat invertedTextImage;
+			cv::bitwise_not(textImage, invertedTextImage);	// 白背景化
+
+			std::wstring invertedText = TextFromImage(invertedTextImage);
+			recognizerText = invertedText;
+		}
+	};
+
+	std::wstring	subName;
+	std::wstring	name;
+
+	funcImageToText(kUmaMusumeNameBounds, name);
+	if (name.size()) {
+		funcImageToText(kUmaMusumeSubNameBounds, subName);
+		if (subName.size()) {
+			std::wstring ikuseUmaMusumeName = subName + name;
+			return ikuseUmaMusumeName;
+		}
 	}
-
-	//CRect rcWindow;
-	//::GetWindowRect(hwndTarget, &rcWindow);
-
-	CRect rcClient;
-	hwndTarget.GetClientRect(&rcClient);
-
-	CWindow wind;
-	hwndTarget.MapWindowPoints(NULL, &rcClient);
-	CRect rcAdjustClient = rcClient;
-
-	if (g_funcSetThreadDpiAwarenessContext) {
-		g_funcSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED);
-	}
-
-	CDC dcMemory;
-	dcMemory.CreateCompatibleDC(dc);
-
-	LPVOID           lp = nullptr;
-	BITMAPINFO       bmi = {};
-	BITMAPINFOHEADER bmiHeader = { sizeof(BITMAPINFOHEADER) };
-	bmiHeader.biWidth = rcAdjustClient.Width();
-	bmiHeader.biHeight = rcAdjustClient.Height();
-	bmiHeader.biPlanes = 1;
-	bmiHeader.biBitCount = 24;
-	bmi.bmiHeader = bmiHeader;
-
-	//CBitmap hbmp = ::CreateCompatibleBitmap(dc, rcAdjustClient.Width(), rcAdjustClient.Height());
-	CBitmap hbmp = ::CreateDIBSection(dc, (LPBITMAPINFO)&bmi, DIB_RGB_COLORS, &lp, NULL, 0);
-	auto prevhbmp = dcMemory.SelectBitmap(hbmp);
-
-	//dcMemory.BitBlt(0, 0, rcWindow.Width(), rcWindow.Height(), dc, 0, 0, SRCCOPY);
-	dcMemory.BitBlt(0, 0, rcAdjustClient.Width(), rcAdjustClient.Height(), dc, rcAdjustClient.left, rcAdjustClient.top, SRCCOPY);
-	dcMemory.SelectBitmap(prevhbmp);
-	return std::unique_ptr<Gdiplus::Bitmap>(Gdiplus::Bitmap::FromHBITMAP(hbmp, NULL));
+	return L"";
+	//INFO_LOG << L"・育成ウマ娘[能力詳細] " << timer.format();
 }
 
 bool UmaTextRecognizer::TextRecognizer(Gdiplus::Bitmap* image)
@@ -259,13 +275,8 @@ bool UmaTextRecognizer::TextRecognizer(Gdiplus::Bitmap* image)
 	m_eventName.clear();
 	m_eventBottomOption.clear();
 
-	std::unique_ptr<Gdiplus::Bitmap> bmpHolder;
 	if (!image) {
-		bmpHolder = ScreenShot();
-		if (!bmpHolder) {
-			return false;
-		}
-		image = bmpHolder.get();
+		return false;
 	}
 
 	cv::Mat srcImage = GdiPlusBitmapToOpenCvMat(image);
@@ -279,20 +290,6 @@ bool UmaTextRecognizer::TextRecognizer(Gdiplus::Bitmap* image)
 	std::list<std::future<std::wstring>> eventBottomOptionFutureList;
 
 
-	auto funcInRangeHSVTextColorBounds = [this](cv::Mat cutImage) -> cv::Mat {
-		cv::Mat hsvImage;
-		cv::cvtColor(cutImage, hsvImage, cv::COLOR_BGR2HSV);
-
-		cv::Mat resizedImage;
-		cv::resize(hsvImage, resizedImage, cv::Size(), kResizeScale, kResizeScale, cv::INTER_LINEAR/*INTER_CUBIC*/);
-
-		// 色による二値化
-		cv::Mat textImage;
-		cv::inRange(resizedImage,
-			cv::Scalar(m_kHSVTextBounds.h_min, m_kHSVTextBounds.s_min, m_kHSVTextBounds.v_min),
-			cv::Scalar(m_kHSVTextBounds.h_max, m_kHSVTextBounds.s_max, m_kHSVTextBounds.v_max), textImage);
-		return textImage;
-	};
 	{	// イベント名
 		//INFO_LOG << L"·イベント名";
 
@@ -351,7 +348,7 @@ bool UmaTextRecognizer::TextRecognizer(Gdiplus::Bitmap* image)
 			CRect rcAdjustTextBounds3 = GetTextBounds(cutImage, rcEventBottomOption);
 			cv::Mat cutImage3(srcImage, cvRectFromCRect(rcAdjustTextBounds3));
 
-			cv::Mat textImage = funcInRangeHSVTextColorBounds(cutImage3);
+			cv::Mat textImage = _InRangeHSVTextColorBounds(cutImage3);
 			// 画像における白文字率を確認して、一定比率以下のときは無視する
 			const double whiteRatio = ImageWhiteRatio(textImage);
 			if (whiteRatio > kMinWhiteTextRatioThreshold) {
@@ -376,74 +373,40 @@ bool UmaTextRecognizer::TextRecognizer(Gdiplus::Bitmap* image)
 		}
 	}
 	{	// 現在の日付
-		Utility::timer timer;
-		CRect rcTurnBounds = _AdjustBounds(srcImage, m_testBounds[kCurrentTurnBounds]);
-		if (!CheckCutBounds(srcImage, cvRectFromCRect(rcTurnBounds), L"rcTurnBounds")) {
-			return false;
-		}
-		cv::Mat cutImage(srcImage, cvRectFromCRect(rcTurnBounds));
-		cv::Mat textImage = funcInRangeHSVTextColorBounds(cutImage);
 
-		std::wstring invertedText;
-		// 画像における白文字率を確認して、一定比率以下のときは無視する
-		const double whiteRatio = ImageWhiteRatio(textImage);
-		if (whiteRatio > kMinWhiteTextRatioThreshold) {
-			cv::Mat invertedTextImage;
-			cv::bitwise_not(textImage, invertedTextImage);	// 白背景化
-
-			invertedText = TextFromImage(invertedTextImage);
-			m_currentTurn.emplace_back(invertedText);
-#if 0
-			cv::Mat resizedImage;
-			constexpr double scale = 2.0;
-			cv::resize(cutImage, resizedImage, cv::Size(), scale, scale, cv::INTER_CUBIC);
-
-			std::wstring resizedText = TextFromImage(resizedImage);
-			m_currentTurn.emplace_back(resizedText);
-#endif
-			//INFO_LOG << L"CurrentTurn, cut: " << cutImageText << L" thres: " << thresImageText;
-		}
-		INFO_LOG << L"·Current date " << timer.format() << L" (" << invertedText << L")";
-	}
-	{	// 育成ウマ娘名[能力詳細]
-		Utility::timer timer;
-
-		std::vector<std::wstring>	subNameList;
-		std::vector<std::wstring>	nameList;
-
-		auto funcImageToText = [&, this](int testBoundsIndex, std::vector<std::wstring>& list) {
-			CRect rcName = _AdjustBounds(srcImage, m_testBounds[testBoundsIndex]);
-			if (!CheckCutBounds(srcImage, cvRectFromCRect(rcName), L"rcName")) {
-				return;
+		auto funcReadCurrentTurn = [&](int currentTurnBounds) {
+			Utility::timer timer;
+			CRect rcTurnBounds = _AdjustBounds(srcImage, m_testBounds[currentTurnBounds]);
+			if (!CheckCutBounds(srcImage, cvRectFromCRect(rcTurnBounds), L"rcTurnBounds")) {
+				return ;
 			}
-			//Utility::timer timer;
-			cv::Mat cutImage(srcImage, cvRectFromCRect(rcName));
-			cv::Mat textImage = funcInRangeHSVTextColorBounds(cutImage);
+			cv::Mat cutImage(srcImage, cvRectFromCRect(rcTurnBounds));
+			cv::Mat textImage = _InRangeHSVTextColorBounds(cutImage);
 
+			std::wstring invertedText;
 			// 画像における白文字率を確認して、一定比率以下のときは無視する
 			const double whiteRatio = ImageWhiteRatio(textImage);
 			if (whiteRatio > kMinWhiteTextRatioThreshold) {
 				cv::Mat invertedTextImage;
 				cv::bitwise_not(textImage, invertedTextImage);	// 白背景化
 
-				std::wstring invertedText = TextFromImage(invertedTextImage);
-				list.emplace_back(invertedText);
+				invertedText = TextFromImage(invertedTextImage);
+				m_currentTurn.emplace_back(invertedText);
+#if 0
+				cv::Mat resizedImage;
+				constexpr double scale = 2.0;
+				cv::resize(cutImage, resizedImage, cv::Size(), scale, scale, cv::INTER_CUBIC);
+
+				std::wstring resizedText = TextFromImage(resizedImage);
+				m_currentTurn.emplace_back(resizedText);
+#endif
+				//INFO_LOG << L"CurrentTurn, cut: " << cutImageText << L" thres: " << thresImageText;
 			}
+		    INFO_LOG << L"·Current date " << timer.format() << L" (" << invertedText << L")";
 		};
 
-		funcImageToText(kUmaMusumeNameBounds, nameList);
-		if (nameList.size()) {
-			funcImageToText(kUmaMusumeSubNameBounds, subNameList);
-			if (subNameList.size()) {
-				const size_t size = subNameList.size();
-				for (int i = 0; i < size; ++i) {
-					std::wstring umamusumeName = subNameList[i] + nameList[i];
-					m_umaMusumeName.emplace_back(umamusumeName);
-				}
-			}
-		}
-
-		INFO_LOG << L"・育成ウマ娘[能力詳細] " << timer.format();
+		funcReadCurrentTurn(kURACurrentTurnBounds);
+		funcReadCurrentTurn(kAoharuCurrentTurnBounds);
 	}
 	{	// 育成ウマ娘名[育成ウマ娘選択]
 		Utility::timer timer;
@@ -502,8 +465,10 @@ bool UmaTextRecognizer::TextRecognizer(Gdiplus::Bitmap* image)
 			return false;
 		}
 		cv::Mat cutImage(srcImage, cvRectFromCRect(rcCurrentMenuBounds));
+		cv::Mat grayImage;
+		cv::cvtColor(cutImage, grayImage, cv::COLOR_RGB2GRAY);	// 3: グレー化
 
-		std::wstring cutImageText = TextFromImage(cutImage);
+		std::wstring cutImageText = TextFromImage(grayImage);
 		if (cutImageText == L"トレーニング") {
 			CRect rcBackButtonBounds = _AdjustBounds(srcImage, m_testBounds[kBackButtonBounds]);
 			if (!CheckCutBounds(srcImage, cvRectFromCRect(rcBackButtonBounds), L"rcBackButtonBounds")) {
@@ -518,6 +483,19 @@ bool UmaTextRecognizer::TextRecognizer(Gdiplus::Bitmap* image)
 		}
 		INFO_LOG << L"·Training" << timer.format();;
 	}
+	{	// 育成トップ
+		m_bIkuseiTop = false;
+		CRect rcAbilityDetailBounds = _AdjustBounds(srcImage, m_testBounds[kAbilityDetailBounds]);
+		if (!CheckCutBounds(srcImage, cvRectFromCRect(rcAbilityDetailBounds), L"rcAbilityDetailBounds")) {
+			return false;
+		}
+		cv::Mat cutImage(srcImage, cvRectFromCRect(rcAbilityDetailBounds));
+		cv::Mat textImage = _InRangeHSVTextColorBounds(cutImage);
+		const double whiteRatio = ImageWhiteRatio(textImage);
+		if (whiteRatio > kAbilityDetailThreshold) {
+			m_bIkuseiTop = true;
+		}
+	}
 	{
 		// レース詳細
 		Utility::timer timer;
@@ -527,7 +505,7 @@ bool UmaTextRecognizer::TextRecognizer(Gdiplus::Bitmap* image)
 			return false;
 		}
 		cv::Mat cutImage(srcImage, cvRectFromCRect(rcRaceDetailBounds));
-		cv::Mat textImage = funcInRangeHSVTextColorBounds(cutImage);
+		cv::Mat textImage = _InRangeHSVTextColorBounds(cutImage);
 
 		std::wstring invertedText;
 		// 画像における白文字率を確認して、一定比率以下のときは無視する
@@ -606,6 +584,7 @@ bool UmaTextRecognizer::TextRecognizer(Gdiplus::Bitmap* image)
 	return true;
 }
 
+
 CRect UmaTextRecognizer::_AdjustBounds(const cv::Mat& srcImage, CRect bounds)
 {
 	//CSize imageSize(static_cast<int>(image->GetWidth()), static_cast<int>(image->GetHeight()));
@@ -653,4 +632,20 @@ bool UmaTextRecognizer::_IsEventNameIcon(cv::Mat srcImage)
 	const double whiteRatio = ImageWhiteRatio(thresImage);
 	bool isIcon = whiteRatio > kEventNameIconWhiteRatioThreshold;	// 白の比率が一定以上ならアイコンとみなす
 	return isIcon;
+}
+
+cv::Mat UmaTextRecognizer::_InRangeHSVTextColorBounds(cv::Mat cutImage)
+{
+	cv::Mat hsvImage;
+	cv::cvtColor(cutImage, hsvImage, cv::COLOR_BGR2HSV);
+
+	cv::Mat resizedImage;
+	cv::resize(hsvImage, resizedImage, cv::Size(), kResizeScale, kResizeScale, cv::INTER_LINEAR/*INTER_CUBIC*/);
+
+	// 色による二値化
+	cv::Mat textImage;
+	cv::inRange(resizedImage,
+		cv::Scalar(m_kHSVTextBounds.h_min, m_kHSVTextBounds.s_min, m_kHSVTextBounds.v_min),
+		cv::Scalar(m_kHSVTextBounds.h_max, m_kHSVTextBounds.s_max, m_kHSVTextBounds.v_max), textImage);
+	return textImage;
 }

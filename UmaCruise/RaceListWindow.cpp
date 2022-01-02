@@ -54,10 +54,17 @@ void RaceListWindow::ShowWindow(bool bShow)
 	__super::ShowWindow(bShow);
 }
 
-void RaceListWindow::AnbigiousChangeCurrentTurn(const std::vector<std::wstring>& ambiguousCurrentTurn)
+void RaceListWindow::AnbigiousChangeCurrentTurn(const std::vector<std::wstring>& ambiguousCurrentTurn, bool ikuseiTop)
 {
 	std::wstring currentTurn = m_raceDateLibrary.AnbigiousChangeCurrentTurn(ambiguousCurrentTurn);
 	if (currentTurn.length() && m_currentTurn != currentTurn.c_str()) {
+		// ターン更新時
+		m_bTurnChanged = true;
+
+		_UpdateRaceList(currentTurn);
+	}
+	if (m_bTurnChanged && ikuseiTop) {
+		m_bTurnChanged = false;
 
 		if (m_config.notifyFavoriteRaceHold && _IsFavoriteRaceTurn(currentTurn)) {	// 通知する
 			// ウィンドウを振動させる
@@ -88,10 +95,8 @@ void RaceListWindow::AnbigiousChangeCurrentTurn(const std::vector<std::wstring>&
 				// 元の位置に戻す
 				wndTop.SetWindowPos(NULL, rcOriginal.left, rcOriginal.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_ASYNCWINDOWPOS);
 
-			}).detach();
+				}).detach();
 		}
-
-		_UpdateRaceList(currentTurn);
 	}
 }
 
@@ -100,6 +105,8 @@ void RaceListWindow::EntryRaceDistance(int distance)
 	if (distance == 0 || m_currentTurn.IsEmpty() || m_currentTurn == L"ファイナルズ開催中") {
 		return;
 	}
+
+	m_bTurnChanged = false;	// レース終了後に通知が来ないように
 	
 	const int currentTurn = m_raceDateLibrary.GetTurnNumberFromTurnName((LPCWSTR)m_currentTurn);
 	ATLASSERT(currentTurn != -1);
@@ -526,9 +533,11 @@ void RaceListWindow::_UpdateRaceList(const std::wstring& turn)
 	m_raceListView.SetRedraw(FALSE);
 	m_raceListView.DeleteAllItems();
 
+	const int currentTurnNumber = m_raceDateLibrary.GetTurnNumberFromTurnName(turn);
+	int nearestFavoriteRaceTurnNumber = 0;
 	size_t i = 0;
 	if (turn.length() && m_showRaceAfterCurrentDate) {
-		i = m_raceDateLibrary.GetTurnNumberFromTurnName(turn);
+		i = currentTurnNumber;
 	}
 	const int32_t state = _GetRaceMatchState();
 
@@ -554,6 +563,16 @@ void RaceListWindow::_UpdateRaceList(const std::wstring& turn)
 		bool insert = false;
 		for (const auto& race : turnOrderedRaceList[i]) {
 			const bool bFavoriteRace = funcIsFavoriteRace(date, race->RaceName());
+
+			// 現在のターン数から一番近いお気に入りレースターンを記録する
+			if (currentTurnNumber > 0 &&				// 現在がデビュー前ではない
+				bFavoriteRace &&		// お気に入りレース
+				nearestFavoriteRaceTurnNumber == 0 &&	// もうすでにお気に入りレースが登録されていない
+				currentTurnNumber <= i)	// 現在の日付以降のレースである
+			{
+				nearestFavoriteRaceTurnNumber = i;
+			}
+
 			if (race->IsMatchState(state) || bFavoriteRace) {
 				if (!insert) {
 					insert = !insert;
@@ -580,6 +599,19 @@ void RaceListWindow::_UpdateRaceList(const std::wstring& turn)
 		}
 	}
 	m_raceListView.SetRedraw(TRUE);
+
+	// 予約レースまでのターン数表示
+	if (nearestFavoriteRaceTurnNumber > 0) {
+		const int remainingTurn = nearestFavoriteRaceTurnNumber - currentTurnNumber;
+		if (remainingTurn > 0) {
+			m_remainingTurn.Format(m_config.i18n.GetCSText(STR_COUNT_DOWN_LEFT), remainingTurn);
+		} else {
+			m_remainingTurn = m_config.i18n.GetCSText(STR_COUNT_DOWN_CUR);
+		}
+	} else {
+		m_remainingTurn = L"";
+	}
+	DoDataExchange(DDX_LOAD, IDC_EDIT_REMAININGTURN);
 }
 
 int32_t RaceListWindow::_GetRaceMatchState()

@@ -1,13 +1,16 @@
 #include "stdafx.h"
 #include "ConfigDlg.h"
 
+#include <wtl\atldlgs.h>
+
 #include "Utility\json.hpp"
 #include "Utility\CommonUtility.h"
 #include "Utility\Logger.h"
 #include "Utility\WinHTTPWrapper.h"
 
+#include "WindowsGraphicsCaptureWrapper.h"
+
 using json = nlohmann::json;
-using namespace WinHTTPWrapper;
 
 ConfigDlg::ConfigDlg(Config& config) : m_config(config)
 {
@@ -43,8 +46,13 @@ LRESULT ConfigDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	m_theme = static_cast<int>(m_config.theme);
 	m_windowTopMost = m_config.windowTopMost;
 	m_screenshotFolder = m_config.screenShotFolder.wstring().c_str();
+	m_screenCaptureMethod = m_config.screenCaptureMethod;
 	m_language = static_cast<int>(m_config.language);
 	DoDataExchange(DDX_LOAD);
+
+	if (!WindowsGraphicsCaptureWrapper::IsDllLoaded()) {
+		GetDlgItem(IDC_RADIO_WINDOWSGRAPHICSCAPTURE).EnableWindow(FALSE);
+	}
 
 	DarkModeInit();
 
@@ -54,12 +62,14 @@ LRESULT ConfigDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 LRESULT ConfigDlg::OnOK(WORD, WORD wID, HWND, BOOL&)
 {
 	DoDataExchange(DDX_SAVE);
+
 	if (m_screenshotFolder.GetLength()) {
 		if (!fs::is_directory((LPCWSTR)m_screenshotFolder)) {
 			MessageBox(m_config.i18n.GetCSText(STR_NO_SS_DIR), L"Error", MB_ICONERROR);
 			return 0;
 		}
 	}
+
 	const int index = m_cmbRefreshInterval.GetCurSel();
 	if (index == -1) {
 		ATLASSERT(FALSE);
@@ -76,6 +86,8 @@ LRESULT ConfigDlg::OnOK(WORD, WORD wID, HWND, BOOL&)
 	m_config.windowTopMost = m_windowTopMost;
 	m_config.language = static_cast<I18N::CODE_639_3166>(m_language);
 	m_config.screenShotFolder = (LPCWSTR)m_screenshotFolder;
+	m_config.screenCaptureMethod = static_cast<Config::ScreenCaptureMethod>(m_screenCaptureMethod);
+
 	m_config.SaveConfig();
 
 	EndDialog(IDOK);
@@ -90,11 +102,14 @@ LRESULT ConfigDlg::OnCancel(WORD, WORD, HWND, BOOL&)
 // スクリーンショットの保存先フォルダを選択する
 void ConfigDlg::OnScreenShotFolderSelect(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	DWORD dwOptions = FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_FILEMUSTEXIST;
-	CShellFileOpenDialog dlg(nullptr, dwOptions);
-	auto ret = dlg.DoModal();
-	if (ret == IDOK) {
-		dlg.GetFilePath(m_screenshotFolder);
-		DoDataExchange(DDX_LOAD, IDC_EDIT_SS_FOLDER);
-	}
+	std::thread([this]() {
+		DWORD dwOptions = FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_FILEMUSTEXIST;
+		CShellFileOpenDialog dlg(nullptr, dwOptions);
+		auto ret = dlg.DoModal(m_hWnd);
+		if (ret == IDOK) {
+			dlg.GetFilePath(m_screenshotFolder);
+			DoDataExchange(DDX_LOAD, IDC_EDIT_SS_FOLDER);
+		}
+	}).detach();
+
 }

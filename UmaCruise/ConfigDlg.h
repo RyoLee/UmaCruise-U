@@ -27,6 +27,7 @@ public:
 		DDX_CHECK(IDC_CHECK_WINDOW_TOPMOST, m_windowTopMost)
 		DDX_TEXT(IDC_EDIT_SS_FOLDER, m_screenshotFolder)
 		DDX_COMBO_INDEX(IDC_COMBO_LANGUAGE, m_language)
+		DDX_RADIO(IDC_RADIO_GDI, m_screenCaptureMethod)
 	END_DDX_MAP()
 
 	BEGIN_MSG_MAP_EX(ConfigDlg)
@@ -60,6 +61,8 @@ private:
 	int		m_theme = Config::kAuto;
 	bool	m_windowTopMost = false;
 	CString m_screenshotFolder;
+	int		m_screenCaptureMethod = Config::kGDI;
+
 	int		m_language = I18N::CODE_639_3166::en_US;
 
 };

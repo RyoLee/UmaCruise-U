@@ -153,6 +153,7 @@ LRESULT CAboutDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	}
 #endif
 	DarkModeInit();
+
 	return TRUE;
 }
 
@@ -286,7 +287,7 @@ LRESULT CAboutDlg::OnOCR(WORD, WORD, HWND, BOOL&)
 
 	cv::imwrite((GetExeDirectory() / L"cutImage.png").string().c_str(), cutImage);
 
-	if (index == kCurrentTurnBounds || ::GetKeyState(VK_RWIN) < 0) {
+	if (index == kURACurrentTurnBounds || index == kAoharuCurrentTurnBounds || ::GetKeyState(VK_RWIN) < 0) {
 		//cv::imwrite((GetExeDirectory() / L"test.png").string().c_str(), cutImage);
 		//cv::Mat cutImage;
 		//cutImage = cv::imread((GetExeDirectory() / L"test.png").string().c_str());
@@ -357,10 +358,6 @@ LRESULT CAboutDlg::OnOCR(WORD, WORD, HWND, BOOL&)
 		ATLTRACE(L"Cutting and converting %s\n", UTF16fromUTF8(timer.format()).c_str());
 
 		std::function<std::wstring(cv::Mat)> funcTextFromImage = TextFromImage;
-		if (index == kCurrentTurnBounds) {
-			//funcTextFromImage = TextFromImageBest;
-		}
-
 		//cv::imwrite((GetExeDirectory() / L"test.png").string().c_str(), cutImage);
 
 		cv::imshow("1", cutImage);
