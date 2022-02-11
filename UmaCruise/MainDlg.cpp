@@ -1164,57 +1164,48 @@ void CMainDlg::_CheckUmaLibrary(I18N::CODE_639_3166 language)
 		json jsonCommon;
 		ifs >> jsonCommon;
 		std::string libraryURL;
-		if(I18N::CODE_639_3166::ja_JP != language){
+		if (I18N::CODE_639_3166::ja_JP != language) {
 			std::string ts = jsonCommon["Common"]["LibraryURL"]["default"];
 			libraryURL = ts;
 		}
-		else{
+		else {
 			std::string ts = jsonCommon["Common"]["LibraryURL"]["ja_JP"];
 			libraryURL = ts;
 		}
-		libraryURL += "?" + std::to_string(std::time(nullptr));	// キャッシュ取得回避
 		// ファイルサイズ取得
 		auto umaLibraryPath = GetExeDirectory() / L"UmaLibrary" / L"UmaMusumeLibrary.json";
 		const DWORD umaLibraryFileSize = static_cast<DWORD>(fs::file_size(umaLibraryPath));
-
-		CUrl downloadUrl(libraryURL.c_str());
-		auto hConnect = HttpConnect(downloadUrl);
-		auto hRequest = HttpOpenRequest(downloadUrl, hConnect, L"HEAD", L"", true);
-		if (HttpSendRequestAndReceiveResponse(hRequest)) {
-			int statusCode = HttpQueryStatusCode(hRequest);
-			if (statusCode == 200) {
-				DWORD contentLength = 0;
-				HttpQueryHeaders(hRequest, WINHTTP_QUERY_CONTENT_LENGTH, contentLength);
-				if (umaLibraryFileSize != contentLength) {	// ファイルサイズ比較
-					if(MessageBox(m_config.i18n.GetCSText(STR_NEW_LIB), L"Update", MB_ICONINFORMATION|MB_YESNO)==IDYES)
-					{
-						auto optDLData = HttpDownloadData(downloadUrl.GetURL());
-						if (optDLData) {
-							fs::remove(umaLibraryPath);
-							SaveFile(umaLibraryPath, optDLData.get());
-							return;
-						} else {
-							MessageBox(m_config.i18n.GetCSText(STR_DOWNLOAD_FAILED), L"Error", MB_ICONERROR);
-							return;
-						}
-					}
-					else {
+		std::string libVerURL = libraryURL + ".ver";
+		if (auto optVersion = HttpDownloadData(libVerURL.c_str())) {
+			std::wstring latestVersion = UTF16fromUTF8(optVersion.get());
+			boost::algorithm::trim_all(latestVersion);
+			if (umaLibraryFileSize != std::stoi(latestVersion)) {
+				if (MessageBox(m_config.i18n.GetCSText(STR_NEW_LIB), L"Update", MB_ICONINFORMATION | MB_YESNO) == IDYES)
+				{
+					if (auto optDLData = HttpDownloadData(libraryURL.c_str())) {
+						fs::remove(umaLibraryPath);
+						SaveFile(umaLibraryPath, optDLData.get());
 						return;
 					}
-				} else {
+					else {
+						MessageBox(m_config.i18n.GetCSText(STR_DOWNLOAD_FAILED), L"Error", MB_ICONERROR);
+						return;
+					}
+				}
+				else {
 					return;
 				}
-			} else {
-				CString errorText;
-				errorText.Format(m_config.i18n.GetCSText(STR_ERROR_HTTP_CODE), statusCode);
-				MessageBox(errorText, L"Error", MB_ICONERROR);
+			}
+			else {
 				return;
 			}
-		} else {
+		}
+		else {
 			MessageBox(m_config.i18n.GetCSText(STR_FAILED), L"Error", MB_ICONERROR);
 			return;
 		}
-	} catch (boost::exception& e) {
+	}
+	catch (boost::exception& e) {
 		std::string expText = boost::diagnostic_information(e);
 		ERROR_LOG << L"CheckUmaLibrary exception: " << (LPCWSTR)CA2W(expText.c_str());
 		int a = 0;

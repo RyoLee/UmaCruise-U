@@ -33,7 +33,7 @@ struct Config
 	void	SaveConfig();
 	I18N	i18n;
 	CFont	gFont;
-	LPCWSTR kAppVersion = L"v1.18-sp1" DEBUG_STRING;
+	LPCWSTR kAppVersion = L"v1.18-sp2" DEBUG_STRING;
 	LPCWSTR	bAppVersion = L"v1.18";
 };
 
