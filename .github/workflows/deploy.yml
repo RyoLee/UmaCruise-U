@@ -57,7 +57,7 @@ jobs:
     - name: Build
       run: |
         cd ${{ github.workspace }}
-        $Env:VCPKG_DEFAULT_TRIPLET=x64-windows-static
+        $Env:VCPKG_DEFAULT_TRIPLET="x64-windows-static"
         msbuild /m /p:Configuration=Release /p:Platform=x64
         cd ${{ github.workspace }}/Release/UmaCruise-U
         wget -q -O ./UmaLibrary/UmaMusumeLibrary.json https://raw.githubusercontent.com/RyoLee/UmaUmaCruise-db-urarawin/master/UmaMusumeLibrary.json
