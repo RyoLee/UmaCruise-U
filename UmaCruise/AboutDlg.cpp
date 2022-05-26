@@ -131,7 +131,7 @@ LRESULT CAboutDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	if (g_versionCheckText.IsEmpty()) {
 		std::thread([this]() {
 			CWindow wndVersionCheck = GetDlgItem(IDC_SYSLINK_VERSIONCHECK);
-			CString versionURL = L"https://cdn.jsdelivr.net/gh/RyoLee/UmaCruise-U@master/appversion.txt";
+			CString versionURL = L"https://raw.githubusercontents.com/RyoLee/UmaCruise-U/master/appversion.txt";
 			if (auto optVersion = WinHTTPWrapper::HttpDownloadData(versionURL)) {
 				std::wstring latestVersion = UTF16fromUTF8(optVersion.get());
 				boost::algorithm::trim_all(latestVersion);

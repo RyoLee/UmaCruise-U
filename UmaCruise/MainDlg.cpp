@@ -1134,8 +1134,8 @@ std::unique_ptr<Gdiplus::Bitmap> CMainDlg::_ScreenShotUmaWindow()
 }
 void CMainDlg::_CheckUmaCruiseU(){
 	
-	CString versionURL = L"https://cdn.jsdelivr.net/gh/RyoLee/UmaCruise-U@master/appversion.txt";
-	CString upgradeURL = L"https://cdn.jsdelivr.net/gh/RyoLee/UmaCruise-U@res/UmaCruise-U.7z";
+	CString versionURL = L"https://raw.githubusercontents.com/RyoLee/UmaCruise-U/master/appversion.txt";
+	CString upgradeURL = L"https://raw.githubusercontents.com/RyoLee/UmaCruise-U/res/UmaCruise-U.7z";
 	if (auto optVersion = HttpDownloadData(versionURL)) {
 		std::wstring latestVersion = UTF16fromUTF8(optVersion.get());
 		boost::algorithm::trim_all(latestVersion);
