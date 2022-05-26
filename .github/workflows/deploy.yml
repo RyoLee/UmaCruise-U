@@ -22,14 +22,11 @@ jobs:
       with:
         fetch-depth: 0
 
-
-    - name: Get cmake
-      uses: lukka/get-cmake@latest
-    #- name: Add msbuild to PATH
-    #  uses: microsoft/setup-msbuild@v1.1
-    #  with:
-    #    vs-version: '[17.0,18.0)'
-    #    msbuild-architecture: x64
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.1
+      with:
+        vs-version: '[17.0,18.0)'
+        msbuild-architecture: x64
 
     - name: Restore vcpkg and its artifacts.
       uses: actions/cache@v2
@@ -56,24 +53,12 @@ jobs:
     - name: remove system vcpkg(windows)
       run: rm -rf "$VCPKG_INSTALLATION_ROOT"
       shell: bash
-      
-    - uses: ilammy/msvc-dev-cmd@v1
-      with:
-        arch: x64
-    - name: Running cmake
-      run: |
-        cd ${{ github.workspace }}
-        cd build
-        cmake .. -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release
-    - name: Build Solution
-      run: |
-        cd build
-        cmake --build . --parallel --config Release
-    # - name: Build
-    #   run: |
-    #     msbuild /m /p:Configuration=Release /p:Platform=x64
+
     - name: Build
       run: |
+        cd ${{ github.workspace }}
+        set VCPKG_DEFAULT_TRIPLET = x64-windows-static
+        msbuild /m /p:Configuration=Release /p:Platform=x64
         cd ${{ github.workspace }}/Release/UmaCruise-U
         wget -q -O ./UmaLibrary/UmaMusumeLibrary.json https://raw.githubusercontent.com/RyoLee/UmaUmaCruise-db-urarawin/master/UmaMusumeLibrary.json
         7z a UmaCruise-U.7z *
