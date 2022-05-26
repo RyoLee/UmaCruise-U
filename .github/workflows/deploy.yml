@@ -46,7 +46,7 @@ jobs:
         vcpkg integrate install
 
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.1.1
+      uses: microsoft/setup-msbuild@v1.1
       with:
         vs-version: '[17.0,17.1)'
         msbuild-architecture: x64
