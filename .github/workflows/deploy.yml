@@ -45,7 +45,7 @@ jobs:
     - name: Get vcpkg(windows)
       run: |
         cd ${{ github.workspace }}
-        wget -Uri https://github.com/microsoft/vcpkg/archive/refs/tags/2021.04.30.zip -OutFile temp.zip
+        Invoke-WebRequest -Uri https://github.com/microsoft/vcpkg/archive/refs/tags/2021.04.30.zip -OutFile temp.zip
         7z x temp.zip
         mv vcpkg-2021.04.30 vcpkg
         cd vcpkg
@@ -58,7 +58,7 @@ jobs:
         $Env:VCPKG_DEFAULT_TRIPLET="x64-windows-static"
         msbuild /m /p:Configuration=Release /p:Platform="x64"
         cd ${{ github.workspace }}/Release/UmaCruise-U
-        wget -Uri https://raw.githubusercontent.com/RyoLee/UmaUmaCruise-db-urarawin/master/UmaMusumeLibrary.json -OutFile ./UmaLibrary/UmaMusumeLibrary.json
+        Invoke-WebRequest -Uri https://raw.githubusercontent.com/RyoLee/UmaUmaCruise-db-urarawin/master/UmaMusumeLibrary.json -OutFile ./UmaLibrary/UmaMusumeLibrary.json
         7z a UmaCruise-U.7z *
         cd ../../
         Remove-Item public -Recurse -ErrorAction Ignore
