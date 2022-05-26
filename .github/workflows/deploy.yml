@@ -45,21 +45,18 @@ jobs:
     - name: Get vcpkg(windows)
       run: |
         cd ${{ github.workspace }}
-        mkdir build -force
-        git clone https://github.com/Microsoft/vcpkg.git
+        wget -Uri https://github.com/microsoft/vcpkg/archive/refs/tags/2021.04.30.zip -OutFile temp.zip
+        7z x temp.zip
+        mv vcpkg-2021.04.30 vcpkg
         cd vcpkg
         .\bootstrap-vcpkg.bat
         vcpkg integrate install
-
-    - name: remove system vcpkg(windows)
-      run: rm -rf "$VCPKG_INSTALLATION_ROOT"
-      shell: bash
 
     - name: Build
       run: |
         cd ${{ github.workspace }}
         $Env:VCPKG_DEFAULT_TRIPLET="x64-windows-static"
-        msbuild /m /p:Configuration=Release
+        msbuild /m /p:Configuration=Release /p:Platform="x64"
         cd ${{ github.workspace }}/Release/UmaCruise-U
         wget -Uri https://raw.githubusercontent.com/RyoLee/UmaUmaCruise-db-urarawin/master/UmaMusumeLibrary.json -OutFile ./UmaLibrary/UmaMusumeLibrary.json
         7z a UmaCruise-U.7z *
