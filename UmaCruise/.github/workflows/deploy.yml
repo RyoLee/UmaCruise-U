@@ -1,0 +1,102 @@
+name: CI
+# Workflow file for windows
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'appversion.txt'
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'appversion.txt'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      VCPKG_ROOT: '${{ github.workspace }}/vcpkg'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Restore vcpkg and its artifacts.
+      uses: actions/cache@v2
+      id: vcpkg-cache
+      with:
+        path: |
+          ${{ env.VCPKG_ROOT }}
+          ${{ github.workspace }}/build/vcpkg_installed
+          !${{ env.VCPKG_ROOT }}/.git
+          !${{ env.VCPKG_ROOT }}/buildtrees
+          !${{ env.VCPKG_ROOT }}/packages
+          !${{ env.VCPKG_ROOT }}/downloads
+        key: |
+          ${{ hashFiles( 'vcpkg.json' ) }}-windows-latest-cache
+
+    - name: Get vcpkg(windows)
+      run: |
+        cd ${{ github.workspace }}
+        mkdir build -force
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        .\bootstrap-vcpkg.bat
+        vcpkg integrate install
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.1
+      with:
+        msbuild-architecture: x64
+
+    - name: Build
+      run: |
+        msbuild /m /p:Configuration=Release /p:Platform=x64
+        cd ./Release/UmaCruise-U
+        wget -q -O ./UmaLibrary/UmaMusumeLibrary.json https://raw.githubusercontent.com/RyoLee/UmaUmaCruise-db-urarawin/master/UmaMusumeLibrary.json
+        7z a UmaCruise-U.7z *
+        cd ../../
+        Remove-Item public -Recurse -ErrorAction Ignore
+        mkdir public
+        mv ./Release/UmaCruise-U/UmaCruise-U.7z ./public/
+        cp appversion.txt ./public/
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Gevjon
+        retention-days: 1
+        path: |
+          public/UmaCruise-U.7z
+          public/appversion.txt
+ 
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:      
+    - name: Download artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: Gevjon
+        path: public
+    - name: Pack
+      run: |
+        VER=$(head -n 1 ./public/appversion.txt)
+        echo "TAG_NAME=$VER" >> $GITHUB_ENV
+        CONTENT="Checksum(SHA256): "$(sha256sum public//UmaCruise-U.7z | awk '{print $1}')
+        echo "DEFAULT_CONTENT=$CONTENT" >> $GITHUB_ENV
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        body: ${{ env.DEFAULT_CONTENT }}
+        generate_release_notes: true
+        tag_name: ${{ env.TAG_NAME }}
+        files: public/UmaCruise-U.7z
+
+    - name: Deploy github pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./public
+        keep_files: true
