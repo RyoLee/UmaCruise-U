@@ -49,6 +49,7 @@ jobs:
         git clone https://github.com/Microsoft/vcpkg.git
         cd vcpkg
         .\bootstrap-vcpkg.bat
+        vcpkg integrate install
 
     - name: remove system vcpkg(windows)
       run: rm -rf "$VCPKG_INSTALLATION_ROOT"
