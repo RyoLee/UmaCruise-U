@@ -34,7 +34,7 @@ jobs:
       with:
         path: |
           ${{ env.VCPKG_ROOT }}
-          ${{ github.workspace }}/build/vcpkg_installed
+          ${{ github.workspace }}/vcpkg_installed
           !${{ env.VCPKG_ROOT }}/.git
           !${{ env.VCPKG_ROOT }}/buildtrees
           !${{ env.VCPKG_ROOT }}/packages
