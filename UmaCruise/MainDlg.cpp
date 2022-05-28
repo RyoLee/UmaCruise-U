@@ -1133,24 +1133,40 @@ std::unique_ptr<Gdiplus::Bitmap> CMainDlg::_ScreenShotUmaWindow()
 	return ss;
 }
 void CMainDlg::_CheckUmaCruiseU(){
-	
-	CString versionURL = L"https://raw.githubusercontents.com/RyoLee/UmaCruise-U/master/appversion.txt";
-	CString upgradeURL = L"https://raw.githubusercontents.com/RyoLee/UmaCruise-U/res/UmaCruise-U.7z";
-	if (auto optVersion = HttpDownloadData(versionURL)) {
-		std::wstring latestVersion = UTF16fromUTF8(optVersion.get());
-		boost::algorithm::trim_all(latestVersion);
-		if (latestVersion !=  m_config.kAppVersion) {
-			CString msg;
-			msg.Format(m_config.i18n.GetCSText(STR_NEW_UCU), latestVersion.c_str(),  m_config.kAppVersion);
-			if (MessageBox(msg, L"Update", MB_ICONINFORMATION|MB_YESNO) == IDYES) {
-				::ShellExecute(NULL, nullptr, upgradeURL, nullptr, nullptr, SW_NORMAL);
-				exit(0);
-			}
+	try {
+		std::ifstream ifs((GetExeDirectory() / L"UmaLibrary" / "Common.json").wstring());
+		ATLASSERT(ifs);
+		if (!ifs) {
+			MessageBox(m_config.i18n.GetCSText(STR_ERROR_COMMON_LOAD_FAILED));
+			return;
 		}
-	} else {
-		MessageBox(m_config.i18n.GetCSText(STR_DOWNLOAD_FAILED), L"Error", MB_ICONERROR);
-		return;
+		json jsonCommon;
+		ifs >> jsonCommon;
+		std::string versionURL=jsonCommon["Common"]["URL"]["Version"];
+		if (auto optVersion = HttpDownloadData(versionURL.c_str())) {
+			std::wstring latestVersion = UTF16fromUTF8(optVersion.get());
+			boost::algorithm::trim_all(latestVersion);
+			if (latestVersion !=  m_config.kAppVersion) {
+				CString msg;
+				msg.Format(m_config.i18n.GetCSText(STR_NEW_UCU), latestVersion.c_str(),  m_config.kAppVersion);
+				if (MessageBox(msg, L"Update", MB_ICONINFORMATION|MB_YESNO) == IDYES) {
+					::ShellExecute(NULL, nullptr, L"https://github.com/RyoLee/UmaCruise-U/releases", nullptr, nullptr, SW_NORMAL);
+					exit(0);
+				} else {
+					return;
+				}
+			}
+		} else {
+			MessageBox(m_config.i18n.GetCSText(STR_DOWNLOAD_FAILED), L"Error", MB_ICONERROR);
+			return;
+		}
 	}
+	catch (boost::exception& e) {
+		std::string expText = boost::diagnostic_information(e);
+		ERROR_LOG << L"CheckUmaCruiseU exception: " << (LPCWSTR)CA2W(expText.c_str());
+	}
+	ATLASSERT(FALSE);
+	MessageBox(m_config.i18n.GetCSText(STR_ERROR), L"Error", MB_ICONERROR);
 }
 void CMainDlg::_CheckUmaLibrary(I18N::CODE_639_3166 language)
 {
@@ -1165,11 +1181,11 @@ void CMainDlg::_CheckUmaLibrary(I18N::CODE_639_3166 language)
 		ifs >> jsonCommon;
 		std::string libraryURL;
 		if (I18N::CODE_639_3166::ja_JP != language) {
-			std::string ts = jsonCommon["Common"]["LibraryURL"]["default"];
+			std::string ts = jsonCommon["Common"]["URL"]["Library"]["default"];
 			libraryURL = ts;
 		}
 		else {
-			std::string ts = jsonCommon["Common"]["LibraryURL"]["ja_JP"];
+			std::string ts = jsonCommon["Common"]["URL"]["Library"]["ja_JP"];
 			libraryURL = ts;
 		}
 		// ファイルサイズ取得
@@ -1208,7 +1224,6 @@ void CMainDlg::_CheckUmaLibrary(I18N::CODE_639_3166 language)
 	catch (boost::exception& e) {
 		std::string expText = boost::diagnostic_information(e);
 		ERROR_LOG << L"CheckUmaLibrary exception: " << (LPCWSTR)CA2W(expText.c_str());
-		int a = 0;
 	}
 	ATLASSERT(FALSE);
 	MessageBox(m_config.i18n.GetCSText(STR_ERROR), L"Error", MB_ICONERROR);

@@ -130,21 +130,36 @@ LRESULT CAboutDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 #else
 	if (g_versionCheckText.IsEmpty()) {
 		std::thread([this]() {
-			CWindow wndVersionCheck = GetDlgItem(IDC_SYSLINK_VERSIONCHECK);
-			CString versionURL = L"https://raw.githubusercontents.com/RyoLee/UmaCruise-U/master/appversion.txt";
-			if (auto optVersion = WinHTTPWrapper::HttpDownloadData(versionURL)) {
-				std::wstring latestVersion = UTF16fromUTF8(optVersion.get());
-				boost::algorithm::trim_all(latestVersion);
-				if (latestVersion != m_config.kAppVersion) {
-					g_versionCheckText.Format(m_config.i18n.GetCSText(STR_NEW_VERSION), latestVersion.c_str());
-					wndVersionCheck.SetWindowText(g_versionCheckText);
+			try {
+				std::ifstream ifs((GetExeDirectory() / L"UmaLibrary" / "Common.json").wstring());
+				ATLASSERT(ifs);
+				if (!ifs) {
+					MessageBox(m_config.i18n.GetCSText(STR_ERROR_COMMON_LOAD_FAILED));
+					return;
+				}
+				json jsonCommon;
+				ifs >> jsonCommon;
+				std::string versionURLstr=jsonCommon["Common"]["URL"]["Version"];
+				CWindow wndVersionCheck = GetDlgItem(IDC_SYSLINK_VERSIONCHECK);
+				CString versionURL = versionURLstr.c_str();
+				if (auto optVersion = WinHTTPWrapper::HttpDownloadData(versionURL)) {
+					std::wstring latestVersion = UTF16fromUTF8(optVersion.get());
+					boost::algorithm::trim_all(latestVersion);
+					if (latestVersion != m_config.kAppVersion) {
+						g_versionCheckText.Format(m_config.i18n.GetCSText(STR_NEW_VERSION), latestVersion.c_str());
+						wndVersionCheck.SetWindowText(g_versionCheckText);
+					} else {
+						g_versionCheckText = m_config.i18n.GetCSText(STR_NO_UPDATE);
+						wndVersionCheck.SetWindowText(g_versionCheckText);
+					}				
 				} else {
-					g_versionCheckText = m_config.i18n.GetCSText(STR_NO_UPDATE);
+					g_versionCheckText = m_config.i18n.GetCSText(STR_CHECK_FAILED);
 					wndVersionCheck.SetWindowText(g_versionCheckText);
-				}				
-			} else {
-				g_versionCheckText = m_config.i18n.GetCSText(STR_CHECK_FAILED);
-				wndVersionCheck.SetWindowText(g_versionCheckText);
+				}
+			}
+			catch (boost::exception& e) {
+				std::string expText = boost::diagnostic_information(e);
+				ERROR_LOG << L"CheckUmaCruiseU exception: " << (LPCWSTR)CA2W(expText.c_str());
 			}
 		}).detach();
 	} else {

@@ -4,11 +4,11 @@ on:
   push:
     branches: [ master ]
     paths:
-      - 'appversion.txt'
+      - 'UmaCruise/Config.h'
   pull_request:
     branches: [ master ]
     paths:
-      - 'appversion.txt'
+      - 'UmaCruise/Config.h'
   workflow_dispatch:
 
 jobs:
@@ -66,7 +66,7 @@ jobs:
         Remove-Item public -Recurse -ErrorAction Ignore
         mkdir public
         mv ./Release/UmaCruise-U/UmaCruise-U.7z ./public/
-        cp appversion.txt ./public/
+        cp UmaCruise/Config.h ./public/
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
@@ -75,7 +75,7 @@ jobs:
         retention-days: 1
         path: |
           public/UmaCruise-U.7z
-          public/appversion.txt
+          public/Config.h
  
   release:
     needs: build
@@ -88,7 +88,9 @@ jobs:
         path: public
     - name: Pack
       run: |
-        VER=$(head -n 1 ./public/appversion.txt)
+        mv public/Config.h ./
+        echo $(cat Config.h |grep "#define"|grep "VER_BASE"|grep -Eo '".*"'|tr -d '"')$(cat Config.h |grep "#define"|grep "VER_POSTFIX"|grep -Eo '".*"'|tr -d '"') > ./public/version.txt
+        VER=$(head -n 1 ./public/version.txt)
         echo "TAG_NAME=$VER" >> $GITHUB_ENV
         CONTENT="Checksum(SHA256): "$(sha256sum public//UmaCruise-U.7z | awk '{print $1}')
         echo "DEFAULT_CONTENT=$CONTENT" >> $GITHUB_ENV

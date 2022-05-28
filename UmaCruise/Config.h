@@ -7,6 +7,8 @@
 #else
 #define	DEBUG_STRING
 #endif
+#define VER_BASE L"v1.18"
+#define	VER_POSTFIX L"-sp3"
 
 struct Config
 {
@@ -14,7 +16,7 @@ struct Config
 	bool	autoStart = true;
 	bool	stopUpdatePreviewOnTraining = true;
 	bool 	autoCheckDB = true;
-	bool 	autoCheckUpgrade = false;
+	bool 	autoCheckUpgrade = true;
 	bool	notifyFavoriteRaceHold = true;
 	enum Theme {
 		kAuto, kDark, kLight,
@@ -33,7 +35,7 @@ struct Config
 	void	SaveConfig();
 	I18N	i18n;
 	CFont	gFont;
-	LPCWSTR kAppVersion = L"v1.18-sp2" DEBUG_STRING;
-	LPCWSTR	bAppVersion = L"v1.18";
+	LPCWSTR	bAppVersion = VER_BASE;
+	LPCWSTR kAppVersion = VER_BASE VER_POSTFIX DEBUG_STRING;
 };
 

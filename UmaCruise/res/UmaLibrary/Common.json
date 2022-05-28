@@ -1,9 +1,11 @@
 {
     "Common": {
-        "LibraryURL":
-        {
-            "default": "https://raw.githubusercontents.com/RyoLee/UmaUmaCruise-db-urarawin/master/UmaMusumeLibrary.json",
-            "ja_JP": "https://raw.githubusercontents.com/RyoLee/UmaUmaCruise-db-urarawin/master/UmaMusumeLibrary.jp.json"
+        "URL": {
+            "Library":{
+                "default": "https://raw.githubusercontents.com/RyoLee/UmaUmaCruise-db-urarawin/master/UmaMusumeLibrary.json",
+                "ja_JP": "https://raw.githubusercontents.com/RyoLee/UmaUmaCruise-db-urarawin/master/UmaMusumeLibrary.jp.json"
+            },
+            "Version": "https://raw.githubusercontents.com/RyoLee/UmaCruise-U/gh-pages/version.txt"
         },
         "TargetWindow": {
             "WindowName": "umamusume",
