@@ -28,20 +28,6 @@ jobs:
         vs-version: '[17.0,18.0)'
         msbuild-architecture: x64
 
-    - name: Restore vcpkg and its artifacts.
-      uses: actions/cache@v2
-      id: vcpkg-cache
-      with:
-        path: |
-          ${{ env.VCPKG_ROOT }}
-          ${{ github.workspace }}/vcpkg_installed
-          !${{ env.VCPKG_ROOT }}/.git
-          !${{ env.VCPKG_ROOT }}/buildtrees
-          !${{ env.VCPKG_ROOT }}/packages
-          !${{ env.VCPKG_ROOT }}/downloads
-        key: |
-          ${{ hashFiles( 'vcpkg.json' ) }}-windows-latest-cache
-
     - name: Get vcpkg(windows)
       run: |
         cd ${{ github.workspace }}
@@ -71,7 +57,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: Gevjon
+        name: UmaCruise-U
         retention-days: 1
         path: |
           public/UmaCruise-U.7z
@@ -84,7 +70,7 @@ jobs:
     - name: Download artifact
       uses: actions/download-artifact@v2
       with:
-        name: Gevjon
+        name: UmaCruise-U
         path: public
     - name: Pack
       run: |
