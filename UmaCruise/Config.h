@@ -35,6 +35,7 @@ struct Config
 	void	SaveConfig();
 	I18N	i18n;
 	CFont	gFont;
+	
 	LPCWSTR	bAppVersion = VER_BASE;
 	LPCWSTR kAppVersion = VER_BASE VER_POSTFIX DEBUG_STRING;
 };
