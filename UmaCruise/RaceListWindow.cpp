@@ -223,9 +223,9 @@ void RaceListWindow::ChangeIkuseiUmaMusume(const std::wstring& umaName)
 		m_currentFavoriteRaceList.clear();
 		if (umaName.length()) {
 			// お気に入りレースを切り替え
-			const json& jChara = m_jsonCharaFavoriteRaceList[UTF8fromUTF16(umaName)];
+			json& jChara = m_jsonCharaFavoriteRaceList[UTF8fromUTF16(umaName)];
 			if (jChara.is_object()) {
-				const json& jCharaFavoriteRaceList = jChara["FavoriteRaceList"];
+				json& jCharaFavoriteRaceList = jChara[_GetCurrentFavoriteRaceListName()];
 				if (jCharaFavoriteRaceList.is_array()) {
 					m_currentFavoriteRaceList = jCharaFavoriteRaceList.get<std::unordered_set<std::string>>();
 				}
@@ -317,6 +317,10 @@ LRESULT RaceListWindow::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	funcAddColumn(m_config.i18n.GetCSText(IDC_STATIC_DIR_GROUP), 4, 30);
 	funcAddColumn(m_config.i18n.GetCSText(IDC_STATIC_RT_GROUP), 5, 45);
 
+	m_cmbScenarioRace.AddString(L"URA/AO");
+	m_cmbScenarioRace.AddString(L"MNT");
+	m_cmbScenarioRace.SetCurSel(0);
+
 	// 設定読み込み
 	{
 		std::ifstream fs((GetExeDirectory() / "setting.json").wstring());
@@ -330,6 +334,9 @@ LRESULT RaceListWindow::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 				const int32_t state = jsonSetting["MainDlg"].value<int32_t>("RaceMatchState", -1);
 				_SetRaceMatchState(state);
 			}
+
+			const int scenarioRaceIndex = jsonSetting["MainDlg"].value<int>("ScenarioRaceIndex", kURA_AOHARU);
+			m_cmbScenarioRace.SetCurSel(scenarioRaceIndex);
 		} else {
 			_SetRaceMatchState(-1);
 		}
@@ -383,6 +390,8 @@ LRESULT RaceListWindow::OnDestroy(UINT, WPARAM, LPARAM, BOOL&)
 		// Race
 		jsonSetting["MainDlg"]["ShowRaceAfterCurrentDate"] = m_showRaceAfterCurrentDate;
 		jsonSetting["MainDlg"]["RaceMatchState"] = _GetRaceMatchState();
+
+		jsonSetting["MainDlg"]["ScenarioRaceIndex"] = m_cmbScenarioRace.GetCurSel();
 
 		std::ofstream ofs((GetExeDirectory() / "setting.json").wstring());
 		ofs << jsonSetting.dump(4);
@@ -481,6 +490,16 @@ LRESULT RaceListWindow::OnRaceListRClick(LPNMHDR pnmh)
 		_SwitchFavoriteRace(pnmitem->iItem);
 	}
 	return LRESULT();
+}
+void RaceListWindow::OnScenarioRaceChange(UINT uNotifyCode, int nID, CWindow wndCtl)
+{
+	const int index = m_cmbScenarioRace.GetCurSel();
+	ATLASSERT(kURA_AOHARU <= index && index <= kMNT);
+	//ATLTRACE(L"m_cmbScenarioRace.GetCurSel: %d\n", index);
+
+	std::wstring ikuseiUmaMusume;
+	std::swap(ikuseiUmaMusume, m_currentIkuseUmaMusume);
+	ChangeIkuseiUmaMusume(ikuseiUmaMusume);	// update	
 }
 
 void RaceListWindow::OnShowRaceAfterCurrentDate(UINT uNotifyCode, int nID, CWindow wndCtl)
@@ -699,7 +718,7 @@ void RaceListWindow::_SwitchFavoriteRace(int index)
 	if (m_currentIkuseUmaMusume.length()) {
 		// jsonへ保存
 		auto& jChara = m_jsonCharaFavoriteRaceList[UTF8fromUTF16(m_currentIkuseUmaMusume)];
-		jChara["FavoriteRaceList"] = m_currentFavoriteRaceList;
+		jChara[_GetCurrentFavoriteRaceListName()] = m_currentFavoriteRaceList;
 		jChara["RaceMatchState"] = _GetRaceMatchState();
 	}
 
@@ -748,4 +767,18 @@ bool RaceListWindow::_IsFavoriteRaceTurn(const std::wstring& turn)
 	return false;
 }
 
+std::string RaceListWindow::_GetCurrentFavoriteRaceListName()
+{
+	const int index = m_cmbScenarioRace.GetCurSel();
+	switch (index) {
+	case kURA_AOHARU:
+		return "FavoriteRaceList";
+		break;
 
+	case kMNT:
+		return "FavoriteRaceList_MNT";
+		break;
+	}
+	ATLASSERT(FALSE);
+	return "none";
+}

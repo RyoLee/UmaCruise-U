@@ -1,5 +1,6 @@
 {
     "-1600": "The screenshot folder does not exist",
+    "-1520": "Training target changed: ",
     "-1519": "Start",
     "-1518": "Reservation: %d turn(s) left",
     "-1517": "Unexpected HTTP code: %d",
@@ -41,7 +42,7 @@
     "1035": "Automatically starts scanning at startup",
     "1037": "Correct",
     "1038": "Stop refreshing the preview window",
-    "1039": "UmaUmaCruise\n{version}\n\n(c) Copyright 2021 amate",
+    "1039": "UmaUmaCruise\n{version}\n\n(c) Copyright 2021-2022 amate",
     "1040": "<a>https://github.com/RyoLee/UmaUmaCruise-db-urarawin</a>",
     "1041": "Notification on the date of the reserved race",
     "1043": "<a>https://github.com/amate/UmaUmaCruise</a>",

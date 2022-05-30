@@ -14,13 +14,19 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    env:
-      VCPKG_ROOT: '${{ github.workspace }}/vcpkg'
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+
+    - name: Vcpkg(Pre-script)
+      run: |
+        mkdir -Force ${{ github.workspace }}/vcpkg_installed
+
+    - name: Cache(Vcpkg)
+      uses: actions/cache@v2
       with:
-        fetch-depth: 0
+        path: ${{ github.workspace }}/vcpkg_installed
+        key: ${{ runner.os }}-dependencies
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.1
@@ -28,22 +34,16 @@ jobs:
         vs-version: '[17.0,18.0)'
         msbuild-architecture: x64
 
-    - name: Get vcpkg(windows)
+    - name: Vcpkg(Init)
       run: |
-        cd ${{ github.workspace }}
-        git clone https://github.com/Microsoft/vcpkg.git
-        cd vcpkg
-        .\bootstrap-vcpkg.bat
         vcpkg integrate install
-
-    - name: remove system vcpkg(windows)
-      run: rm -rf "$VCPKG_INSTALLATION_ROOT"
-      shell: bash
+        New-Item -ItemType container "${env:VCPKG_INSTALLATION_ROOT}\downloads"
+        Invoke-WebRequest -Uri "https://github.com/microsoft/vcpkg/files/7075269/nasm-2.15.05-win32.zip" -OutFile "${env:VCPKG_INSTALLATION_ROOT}\downloads\nasm-2.15.05-win32.zip"
 
     - name: Build
       run: |
         cd ${{ github.workspace }}
-        msbuild /m /p:Configuration=Release /p:Platform=x64 /p:VcpkgEnableManifest=true /p:VcpkgTriplet=x64-windows-static
+        msbuild /m /p:Configuration=Release /p:Platform=x64 /p:VcpkgEnableManifest=true /p:VcpkgTriplet=x64-windows-static /maxcpucount
         cd ${{ github.workspace }}/Release/UmaCruise-U
         Invoke-WebRequest -Uri https://raw.githubusercontent.com/RyoLee/UmaUmaCruise-db-urarawin/master/UmaMusumeLibrary.json -OutFile ./UmaLibrary/UmaMusumeLibrary.json
         7z a UmaCruise-U.7z *

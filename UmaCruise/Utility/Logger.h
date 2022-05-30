@@ -3,6 +3,7 @@
 */
 
 #pragma once
+
 #if defined BOOST_USE_WINAPI_VERSION 
 #undef BOOST_USE_WINAPI_VERSION
 #endif

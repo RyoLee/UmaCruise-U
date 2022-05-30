@@ -74,6 +74,7 @@
 #define IDC_RADIO_WINDOWSGRAPHICSCAPTURE 1079
 #define IDC_STATIC_CAPTURE_GROUP        1080
 #define IDC_STATIC_CAPTURE_TEXT         1081
+#define IDC_COMBO_SCENARIO_RACE         1082
 
 #define IDC_RICHEDIT21                  1150
 #define IDC_RICHEDIT22                  1151
@@ -124,7 +125,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        210
+#define _APS_NEXT_RESOURCE_VALUE        211
 #define _APS_NEXT_COMMAND_VALUE         32775
 #define _APS_NEXT_CONTROL_VALUE         1662
 #define _APS_NEXT_SYMED_VALUE           101
@@ -160,6 +161,7 @@
 #define STR_ERROR_HTTP_CODE             -1517
 #define STR_COUNT_DOWN_LEFT             -1518
 #define STR_COUNT_DOWN_CUR              -1519
+#define STR_TARGET_CHANGED              -1520
 
 #define STR_NO_SS_DIR                   -1600
 

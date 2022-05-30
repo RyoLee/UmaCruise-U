@@ -7,8 +7,8 @@
 #else
 #define	DEBUG_STRING
 #endif
-#define VER_BASE L"v1.18"
-#define	VER_POSTFIX L"-sp3"
+#define VER_BASE L"v1.19"
+#define	VER_POSTFIX L"-rc0"
 
 struct Config
 {
@@ -35,7 +35,7 @@ struct Config
 	void	SaveConfig();
 	I18N	i18n;
 	CFont	gFont;
-	
+
 	LPCWSTR	bAppVersion = VER_BASE;
 	LPCWSTR kAppVersion = VER_BASE VER_POSTFIX DEBUG_STRING;
 };
