@@ -43,7 +43,7 @@ jobs:
     - name: Build
       run: |
         cd ${{ github.workspace }}
-        msbuild /m /p:Configuration=Release;Platform=x64;VcpkgEnableManifest=true;VcpkgTriplet=x64-windows-static
+        msbuild /m /p:Configuration=Release /p:Platform=x64 /p:VcpkgEnableManifest=true /p:VcpkgTriplet=x64-windows-static
         cd ${{ github.workspace }}/Release/UmaCruise-U
         Invoke-WebRequest -Uri https://raw.githubusercontent.com/RyoLee/UmaUmaCruise-db-urarawin/master/UmaMusumeLibrary.json -OutFile ./UmaLibrary/UmaMusumeLibrary.json
         7z a UmaCruise-U.7z *
