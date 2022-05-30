@@ -156,7 +156,7 @@
       <DllDataFileName />
     </Midl>
     <PreBuildEvent>
-      <Command>rd /s/q "$(SolutionDir)\\tmp
+      <Command>rd /s/q "$(SolutionDir)\\tmp"
 mkdir "$(SolutionDir)\\tmp"
 copy "$(OutDir)\\WindowsGraphicsCapture.dll" "$(SolutionDir)\\tmp"
 rd /s/q "$(SolutionDir)\\x64\\Debug"
@@ -165,12 +165,13 @@ copy "$(SolutionDir)\\AUTHORS.txt" "$(SolutionDir)\\x64\\Debug"
 copy "$(SolutionDir)\\readme.md" "$(SolutionDir)\\x64\\Debug"
 copy "$(SolutionDir)\\readme.base.md" "$(SolutionDir)\\x64\\Debug"
 copy "$(SolutionDir)\\tmp\\WindowsGraphicsCapture.dll" "$(SolutionDir)\\x64\\Debug"
+rd /s/q "$(SolutionDir)\\tmp"
 xcopy "$(SolutionDir)\\UmaCruise\\res\\se" "$(SolutionDir)\\x64\\Debug\\se" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\tessdata" "$(SolutionDir)\\x64\\Debug\\tessdata" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\UmaLibrary" "$(SolutionDir)\\x64\\Debug\\UmaLibrary" /E/I</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>rd /s/q "$(SolutionDir)\\tmp
+      <Command>rd /s/q "$(SolutionDir)\\tmp"
 mkdir "$(SolutionDir)\\tmp"
 copy "$(OutDir)\\WindowsGraphicsCapture.dll" "$(SolutionDir)\\tmp"
 rd /s/q "$(SolutionDir)\\Debug"
@@ -180,6 +181,7 @@ copy "$(SolutionDir)\\AUTHORS.txt" "$(SolutionDir)\\Debug\\UmaCruise-U"
 copy "$(SolutionDir)\\readme.md" "$(SolutionDir)\\Debug\\UmaCruise-U"
 copy "$(SolutionDir)\\readme.base.md" "$(SolutionDir)\\Debug\\UmaCruise-U"
 copy "$(SolutionDir)\\tmp\\WindowsGraphicsCapture.dll" "$(SolutionDir)\\Debug\\UmaCruise-U"
+rd /s/q "$(SolutionDir)\\tmp"
 xcopy "$(SolutionDir)\\UmaCruise\\res\\se" "$(SolutionDir)\\Debug\\UmaCruise-U\\se" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\tessdata" "$(SolutionDir)\\Debug\\UmaCruise-U\\tessdata" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\UmaLibrary" "$(SolutionDir)\\Debug\\UmaCruise-U\\UmaLibrary" /E/I
@@ -248,7 +250,7 @@ copy "$(targetPath)" "$(SolutionDir)\\Debug\\UmaCruise-U\\UmaCruise.exe"</Comman
       <DllDataFileName />
     </Midl>
     <PreBuildEvent>
-      <Command>rd /s/q "$(SolutionDir)\\tmp
+      <Command>rd /s/q "$(SolutionDir)\\tmp"
 mkdir "$(SolutionDir)\\tmp"
 copy "$(OutDir)\\WindowsGraphicsCapture.dll" "$(SolutionDir)\\tmp"
 rd /s/q "$(SolutionDir)\\x64\\Release"
@@ -257,6 +259,7 @@ copy "$(SolutionDir)\\AUTHORS.txt" "$(SolutionDir)\\x64\\Release"
 copy "$(SolutionDir)\\readme.md" "$(SolutionDir)\\x64\\Release"
 copy "$(SolutionDir)\\readme.base.md" "$(SolutionDir)\\x64\\Release"
 copy "$(SolutionDir)\\tmp\\WindowsGraphicsCapture.dll" "$(SolutionDir)\\x64\\Release"
+rd /s/q "$(SolutionDir)\\tmp"
 xcopy "$(SolutionDir)\\UmaCruise\\res\\se" "$(SolutionDir)\\x64\\Release\\se" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\tessdata" "$(SolutionDir)\\x64\\Release\\tessdata" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\UmaLibrary" "$(SolutionDir)\\x64\\Release\\UmaLibrary" /E/I</Command>
@@ -272,6 +275,7 @@ copy "$(SolutionDir)\\AUTHORS.txt" "$(SolutionDir)\\Release\\UmaCruise-U"
 copy "$(SolutionDir)\\readme.md" "$(SolutionDir)\\Release\\UmaCruise-U"
 copy "$(SolutionDir)\\readme.base.md" "$(SolutionDir)\\Release\\UmaCruise-U"
 copy "$(SolutionDir)\\tmp\\WindowsGraphicsCapture.dll" "$(SolutionDir)\\Release\\UmaCruise-U"
+rd /s/q "$(SolutionDir)\\tmp"
 xcopy "$(SolutionDir)\\UmaCruise\\res\\se" "$(SolutionDir)\\Release\\UmaCruise-U\\se" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\tessdata" "$(SolutionDir)\\Release\\UmaCruise-U\\tessdata" /E/I
 xcopy "$(SolutionDir)\\UmaCruise\\res\\UmaLibrary" "$(SolutionDir)\\Release\\UmaCruise-U\\UmaLibrary" /E/I
