@@ -214,7 +214,6 @@ LRESULT CMainDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 		}
 		_InitRaceListWindow();
 		DoDataExchange(DDX_LOAD);
-
 	} catch (std::exception& e)
 	{
 		ATLTRACE(L"%s\n", (LPCWSTR)(CA2W(e.what())));
@@ -401,7 +400,6 @@ void CMainDlg::OnTimer(UINT_PTR nIDEvent)
 		m_cmbUmaMusume.SetRedraw(TRUE);
 
 		m_cmbUmaMusume.ShowDropDown();
-
 	}
 }
 
@@ -793,7 +791,6 @@ void CMainDlg::OnEventNameChanged(UINT uNotifyCode, int nID, CWindow wndCtl)
 		m_eventSource = optUmaEvent->parentCharaEvent->name.c_str();
 		DoDataExchange(DDX_LOAD, IDC_EDIT_EVENT_SOURCE);
 	}
-	
 }
 
 // イベント選択肢の効果を修正する
@@ -912,7 +909,6 @@ BOOL CMainDlg::OnSetCursor(CWindow wnd, UINT nHitTest, UINT message)
 			richEdit.GetClientRect(&rcClient);
 			richEdit.MapWindowPoints(NULL, &rcClient);
 			if (rcClient.PtInRect(ptCursor)) {
-
 				// 効果テキスト取得
 				CString text;
 				richEdit.GetWindowText(text.GetBuffer(kMaxEffectTextLength), kMaxEffectTextLength);
@@ -963,7 +959,6 @@ BOOL CMainDlg::OnSetCursor(CWindow wnd, UINT nHitTest, UINT message)
 		}
 	}
 	if (::GetFocus() != m_popupRichEdit.GetRichEdit() && m_popupRichEdit.GetOriginalEffectRichEdit()) {
-
 		// 効果テキスト取得
 		CString text = m_popupRichEdit.GetEffectText(m_eventName);
 		if (text.GetLength()) {
@@ -1076,7 +1071,6 @@ void CMainDlg::_UpdateEventOptions(const UmaEventLibrary::UmaEvent& umaEvent)
 		GetDlgItem(IDC_OPTION).SetWindowText(umaEvent.eventOptions[i].option.c_str());
 		//GetDlgItem(IDC_EFFECT).SetWindowText(umaEvent.eventOptions[i].effect.c_str());
 		_UpdateEventEffect(GetDlgItem(IDC_EFFECT).m_hWnd, umaEvent.eventOptions[i].effect);
-
 	}
 }
 
@@ -1098,7 +1092,6 @@ void CMainDlg::_UpdateEventEffect(CRichEditCtrl richEdit, const std::wstring& ef
 		ft.chrg.cpMax = -1;
 		ft.lpstrText = searchText;
 		while (LONG pos = richEdit.FindTextW(FR_DOWN, ft) != -1) {
-
 			// 後ろに数字があれば選択範囲を拡大させる
 			++ft.chrgText.cpMax;
 			richEdit.SetSel(ft.chrgText.cpMin, ft.chrgText.cpMax);

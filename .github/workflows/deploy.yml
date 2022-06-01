@@ -46,6 +46,7 @@ jobs:
         msbuild /m /p:Configuration=Release /p:Platform=x64 /p:VcpkgEnableManifest=true /p:VcpkgTriplet=x64-windows-static /maxcpucount
         cd ${{ github.workspace }}/Release/UmaCruise-U
         Invoke-WebRequest -Uri https://raw.githubusercontent.com/RyoLee/UmaUmaCruise-db-urarawin/master/UmaMusumeLibrary.json -OutFile ./UmaLibrary/UmaMusumeLibrary.json
+        Invoke-WebRequest -Uri https://raw.githubusercontent.com/amate/UmaUmaCruise/master/readme.md -OutFile ./README-UUC.md
         7z a UmaCruise-U.7z *
         cd ../../
         Remove-Item public -Recurse -ErrorAction Ignore
@@ -61,11 +62,11 @@ jobs:
         path: |
           public/UmaCruise-U.7z
           public/Config.h
- 
+
   release:
     needs: build
     runs-on: ubuntu-latest
-    steps:      
+    steps:
     - name: Download artifact
       uses: actions/download-artifact@v2
       with:
