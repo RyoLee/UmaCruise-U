@@ -34,10 +34,12 @@ void RaceListWindow::ShowWindow(bool bShow)
 		if (windowRect.is_null() == false && !(::GetKeyState(VK_CONTROL) < 0)) {
 			CRect rc(windowRect[0], windowRect[1], windowRect[2], windowRect[3]);
 			SetWindowPos(NULL, rc.left, rc.top, rc.Width(), rc.Height(), SWP_NOOWNERZORDER | SWP_NOSIZE);
-		} else {
+		}
+		else {
 			CenterWindow(GetParent());
 		}
-	} else {	
+	}
+	else {
 		// 表示位置保存
 		if (IsWindowVisible()) {
 			CRect rcWindow;
@@ -94,7 +96,6 @@ void RaceListWindow::AnbigiousChangeCurrentTurn(const std::vector<std::wstring>&
 
 				// 元の位置に戻す
 				wndTop.SetWindowPos(NULL, rcOriginal.left, rcOriginal.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_ASYNCWINDOWPOS);
-
 				}).detach();
 		}
 	}
@@ -107,7 +108,7 @@ void RaceListWindow::EntryRaceDistance(int distance)
 	}
 
 	m_bTurnChanged = false;	// レース終了後に通知が来ないように
-	
+
 	const int currentTurn = m_raceDateLibrary.GetTurnNumberFromTurnName((LPCWSTR)m_currentTurn);
 	ATLASSERT(currentTurn != -1);
 
@@ -117,13 +118,17 @@ void RaceListWindow::EntryRaceDistance(int distance)
 		RaceDateLibrary::Race::DistanceClass distanceClass;
 		if (kMinSprint <= distance && distance <= kMaxSprint) {
 			distanceClass = RaceDateLibrary::Race::DistanceClass::kSprint;
-		} else if (kMinMile <= distance && distance <= kMaxMile) {
+		}
+		else if (kMinMile <= distance && distance <= kMaxMile) {
 			distanceClass = RaceDateLibrary::Race::DistanceClass::kMile;
-		} else if (kMinMiddle <= distance && distance <= kMaxMiddle) {
+		}
+		else if (kMinMiddle <= distance && distance <= kMaxMiddle) {
 			distanceClass = RaceDateLibrary::Race::DistanceClass::kMiddle;
-		} else if (kMinLong <= distance && distance <= kMaxLong) {
+		}
+		else if (kMinLong <= distance && distance <= kMaxLong) {
 			distanceClass = RaceDateLibrary::Race::DistanceClass::kLong;
-		} else {
+		}
+		else {
 			ATLASSERT(FALSE);
 			return;
 		}
@@ -185,7 +190,7 @@ void RaceListWindow::EntryRaceDistance(int distance)
 	}
 	CString text;
 	std::pair<int, CString> expectURA;
-	LPCWSTR kDisntanceClassNames[4] = { 
+	LPCWSTR kDisntanceClassNames[4] = {
 		m_config.i18n.GetCSText(IDC_CHECK_SPRINT),
 		m_config.i18n.GetCSText(IDC_CHECK_MILE),
 		m_config.i18n.GetCSText(IDC_CHECK_MIDDLE),
@@ -206,7 +211,8 @@ void RaceListWindow::EntryRaceDistance(int distance)
 			if (expectURA.first < ab) {	// 超えたら上書き
 				expectURA.first = ab;
 				expectURA.second = kDisntanceClassNames[i];
-			} else if (expectURA.first == ab) {	// 同値なら追加
+			}
+			else if (expectURA.first == ab) {	// 同値なら追加
 				expectURA.second.AppendFormat(L"/%s", kDisntanceClassNames[i]);
 			}
 		}
@@ -239,7 +245,6 @@ void RaceListWindow::ChangeIkuseiUmaMusume(const std::wstring& umaName)
 		m_currentIkuseUmaMusume = umaName;
 		_UpdateRaceList((LPCWSTR)m_currentTurn);
 	}
-
 }
 
 
@@ -267,14 +272,17 @@ DWORD RaceListWindow::OnItemPrePaint(int, LPNMCUSTOMDRAW lpNMCustomDraw)
 	if (favorite) {
 		if (IsDarkMode()) {
 			pCustomDraw->clrTextBk = m_darkTheme.bkFavorite;
-		} else {
+		}
+		else {
 			pCustomDraw->clrTextBk = m_lightTheme.bkFavorite;
 		}
-	} else {
+	}
+	else {
 		if (IsDarkMode()) {
 			pCustomDraw->clrTextBk = alter ? m_darkTheme.bkRow1 : m_darkTheme.bkRow2;
 
-		} else {
+		}
+		else {
 			pCustomDraw->clrTextBk = alter ? m_lightTheme.bkRow1 : m_lightTheme.bkRow2;
 		}
 	}
@@ -337,7 +345,8 @@ LRESULT RaceListWindow::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 
 			const int scenarioRaceIndex = jsonSetting["MainDlg"].value<int>("ScenarioRaceIndex", kURA_AOHARU);
 			m_cmbScenarioRace.SetCurSel(scenarioRaceIndex);
-		} else {
+		}
+		else {
 			_SetRaceMatchState(-1);
 		}
 	}
@@ -438,15 +447,18 @@ void RaceListWindow::OnExitSizeMove()
 		rcWindow.MoveToX(rcParentWindow.right - cxPadding);
 
 		// メインの左にある
-	} else if (std::abs(rcParentWindow.left - rcWindow.right) <= kDockingMargin) {
+	}
+	else if (std::abs(rcParentWindow.left - rcWindow.right) <= kDockingMargin) {
 		rcWindow.MoveToX(rcParentWindow.left - rcWindow.Width() + cxPadding);
 
 		// メインの上にある
-	} else if (std::abs(rcParentWindow.top - rcWindow.bottom) <= kDockingMargin) {
+	}
+	else if (std::abs(rcParentWindow.top - rcWindow.bottom) <= kDockingMargin) {
 		rcWindow.MoveToY(rcParentWindow.top - rcWindow.Height() + cyPadding);
 
 		// メインの下にある
-	} else if (std::abs(rcParentWindow.bottom - rcWindow.top) <= kDockingMargin) {
+	}
+	else if (std::abs(rcParentWindow.bottom - rcWindow.top) <= kDockingMargin) {
 		rcWindow.MoveToY(rcParentWindow.bottom - cyPadding);
 	}
 	MoveWindow(&rcWindow);
@@ -464,8 +476,8 @@ LRESULT RaceListWindow::OnRaceListClick(LPNMHDR pnmh)
 	auto pnmitem = (LPNMITEMACTIVATE)pnmh;
 	if (!(pnmitem->uKeyFlags == LVKF_CONTROL)) {
 		return 0;	// Ctrlキーを押していなければ無視
-	}	
-	
+	}
+
 	_SwitchFavoriteRace(pnmitem->iItem);
 	return LRESULT();
 }
@@ -516,14 +528,18 @@ void RaceListWindow::OnRaceFilterChanged(UINT uNotifyCode, int nID, CWindow wndC
 	if (bShift) {
 		const bool checked = CButton(GetDlgItem(nID)).GetCheck() == BST_CHECKED;
 		if (IDC_CHECK_G1 <= nID && nID <= IDC_CHECK_PREOP) {
-			m_gradeG1 = m_gradeG2 = m_gradeG3 = m_gradeOP = m_gradePreOP =  checked;
-		} else if (IDC_CHECK_SPRINT <= nID && nID <= IDC_CHECK_LONG) {
+			m_gradeG1 = m_gradeG2 = m_gradeG3 = m_gradeOP = m_gradePreOP = checked;
+		}
+		else if (IDC_CHECK_SPRINT <= nID && nID <= IDC_CHECK_LONG) {
 			m_sprint = m_mile = m_middle = m_long = checked;
-		} else if (IDC_CHECK_GRASS <= nID && nID <= IDC_CHECK_DART) {
+		}
+		else if (IDC_CHECK_GRASS <= nID && nID <= IDC_CHECK_DART) {
 			m_grass = m_dart = checked;
-		} else if (IDC_CHECK_RIGHT <= nID && nID <= IDC_CHECK_LINE) {
+		}
+		else if (IDC_CHECK_RIGHT <= nID && nID <= IDC_CHECK_LINE) {
 			m_right = m_left = m_line = checked;
-		} else if (IDC_CHECK_LOCATION_SAPPORO <= nID && nID <= IDC_CHECK_LOCATION_OOI) {
+		}
+		else if (IDC_CHECK_LOCATION_SAPPORO <= nID && nID <= IDC_CHECK_LOCATION_OOI) {
 			for (bool& location : m_raceLocation) {
 				location = checked;
 			}
@@ -565,7 +581,8 @@ void RaceListWindow::_UpdateRaceList(const std::wstring& turn)
 		auto itfound = m_currentFavoriteRaceList.find(date_race);
 		if (itfound != m_currentFavoriteRaceList.end()) {
 			return true;
-		} else {
+		}
+		else {
 			return false;
 		}
 	};
@@ -613,7 +630,6 @@ void RaceListWindow::_UpdateRaceList(const std::wstring& turn)
 				m_raceListView.SetItemText(pos, 4, race->RotationText().c_str());
 				m_raceListView.SetItemText(pos, 5, race->location.c_str());
 				m_raceListView.SetItemData(pos, flags);
-
 			}
 		}
 	}
@@ -624,10 +640,12 @@ void RaceListWindow::_UpdateRaceList(const std::wstring& turn)
 		const int remainingTurn = nearestFavoriteRaceTurnNumber - currentTurnNumber;
 		if (remainingTurn > 0) {
 			m_remainingTurn.Format(m_config.i18n.GetCSText(STR_COUNT_DOWN_LEFT), remainingTurn);
-		} else {
+		}
+		else {
 			m_remainingTurn = m_config.i18n.GetCSText(STR_COUNT_DOWN_CUR);
 		}
-	} else {
+	}
+	else {
 		m_remainingTurn = L"";
 	}
 	DoDataExchange(DDX_LOAD, IDC_EDIT_REMAININGTURN);
@@ -712,7 +730,8 @@ void RaceListWindow::_SwitchFavoriteRace(int index)
 	// お気に入り登録をスイッチさせる
 	if (nowFavorite) {
 		m_currentFavoriteRaceList.erase(date_race);
-	} else {
+	}
+	else {
 		m_currentFavoriteRaceList.insert(date_race);
 	}
 	if (m_currentIkuseUmaMusume.length()) {
@@ -745,7 +764,8 @@ bool RaceListWindow::_IsFavoriteRaceTurn(const std::wstring& turn)
 		auto itfound = m_currentFavoriteRaceList.find(date_race);
 		if (itfound != m_currentFavoriteRaceList.end()) {
 			return true;
-		} else {
+		}
+		else {
 			return false;
 		}
 	};
